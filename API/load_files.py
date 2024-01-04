@@ -42,3 +42,8 @@ def load_rvc_models(RVC_PATH):
     print(RVC_PATH, rvc_models)
     
     return rvc_models
+
+
+# Load lines in selected book
+def load_selected_book(BOOKS_PATH, book):
+    pass
