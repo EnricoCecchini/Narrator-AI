@@ -3,7 +3,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 
-from load_files import load_speakers, load_books, load_audiobooks, load_rvc_models
+from load_files import load_speakers, load_books, load_audiobooks, load_rvc_models, load_selected_book
 from save_files import save_book
 
 load_dotenv()
@@ -56,12 +56,24 @@ def upload_book():
 
 
 # Load selected book
-@app.route("/load_book", methods=["POST", "GET"])
-def load_book():
-    if request.method == "POST":
-        data = request.get_json()
+@app.route('/load_selected_book', methods=['GET'])
+def load_selected():
+    selected_book = request.args.get('selected_book')
+    
+    print(selected_book)
+    try:
+        book_content = load_selected_book(app.config["BOOKS_PATH"], selected_book)
 
-        print("LOAD BOOK: ", data)
+    except Exception as e:
+        return jsonify({'message': 'Error reading book', 'success': False, 'error': e, 'data': []})
+    
+    result = jsonify({'message': 'Book loaded succesfully', 'success': True, 'error': '', 'data': book_content})
+    print('RESULT: ', result.get_data(as_text=True))
+
+    return result
+    
+
+# Generate audio
 
 # Narrate specific line
 @app.route("/narrate_line", methods=["POST", "GET"])
@@ -76,6 +88,7 @@ def narrate_line():
         line = data["line"]
         rvc_model = data["rvc_model"]
         output_file = data["output_file"]
+
 
 # Narrate entire book
 @app.route("/narrate_entire_audiobook", methods=["POST", "GET"])

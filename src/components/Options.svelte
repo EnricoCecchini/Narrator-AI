@@ -2,8 +2,11 @@
     import { onMount } from 'svelte';
     import {writable} from 'svelte/store';
 
+    import { API_ROUTE } from "../requests/api";
+
     import {load_existing_files} from '../requests/load_existing_data'
     import {upload_book} from '../requests/upload_book'
+    import {load_book} from '../requests/load_book'
 
     import {existing_books, existing_speakers, existing_rvc} from '../../static/store'
     import {selected_book, selected_speaker, selected_rvc} from '../../static/store'
@@ -62,21 +65,27 @@
             console.log("NO BOOK UPLOADED")
         }
 
-        load_existing_files()
+        loadSelectedStore()
         handleParseOptions()
     }
 
-    const handleSelectBook = (event) => {
+    const handleSelectBook = async (event) => {
         console.log(event.target.value)
         selected_book.set(event.target.value)
+        
+        const response = await load_book(event.target.value)
+        
+        const selected_book_content = response.data
+        
+        console.log(selected_book_content)
     }
 
-    const handleSelectSpeaker = (event) => {
+    const handleSelectSpeaker = async (event) => {
         console.log(event.target.value)
         selected_speaker.set(event.target.value)
     }
 
-    const handleSelectRVC = (event) => {
+    const handleSelectRVC = async (event) => {
         console.log(event.target.value)
         selected_rvc.set(event.target.value)
     }

@@ -46,4 +46,19 @@ def load_rvc_models(RVC_PATH):
 
 # Load lines in selected book
 def load_selected_book(BOOKS_PATH, book):
-    pass
+    processed_path = os.path.join(BOOKS_PATH, book, 'Processed')
+
+    # Iterate files in Processed dir and store text in array
+    book_lines = []
+    file_path = ''
+
+    for file in os.listdir(processed_path):
+        file_path = os.path.join(processed_path, file)
+        
+        # Read file content into list
+        with open(file_path, 'r') as f:
+            line = f.readline()
+            line = line.replace('\n', '')
+            book_lines.append(line)
+    
+    return book_lines
