@@ -19,18 +19,22 @@ def save_book(BOOKS_PATH, book):
     # Save OG book
     book.save(os.path.join(new_book_path, book.filename))
 
-    book_path = os.path.join(new_book_path, book.filename)
-    print('READ: ', book_path)
+    book_path = new_book_path
+    print('READ: ', os.path.join(new_book_path, book.filename))
 
     # Read book and split into lines in separate files in Processed dir
-    with open(book_path, 'r') as file:
+    with open(os.path.join(new_book_path, book.filename), 'r', encoding='utf-8') as file:
+        print("READING")
+
         lines = file.readlines()
+        lines = [l for l in lines if len(l.replace('\n', '')) > 0]
         # Skip empty lines
 
         print(lines)
         for i, line in enumerate(lines):
             print(os.path.join(processed_path, f"{i}.txt"))
-            with open(os.path.join(processed_path, f"{i}.txt"), 'w') as f:
+            print(line, '\n')
+            with open(os.path.join(processed_path, f"{i}.txt"), 'w', encoding='utf-8') as f:
                 f.write(line)
     
     return {"message": "Book uploaded and processed succesfully", "success": True}
