@@ -32,7 +32,7 @@
 .options-row {
   display:flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-evenly;
   padding-left: 5vw;
   padding-right: 5vw;
   width: auto;
@@ -49,7 +49,24 @@
   padding: .5vw;
 }
 
-.upload_book {
+.upload_file {
   padding: 1vw;
   border-radius: 0.5vw;
+}
+
+.upload_options {
+  display: flex;
+  flex-direction: row;
+  align-items: left;
+}
+
+.options-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.options-group {
+  display: flex;
+  flex-direction: column;
 }
