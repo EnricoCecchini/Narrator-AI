@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 
 from load_files import load_speakers, load_books, load_audiobooks, load_rvc_models, load_selected_book
-from save_files import save_book
+from save_files import save_book, save_speaker
 
 load_dotenv()
 
@@ -40,18 +40,25 @@ def load_existing_items():
 
     return resp
 
-@app.route("/upload_book", methods=["POST", "GET"])
-def upload_book():
+@app.route("/upload_file", methods=["POST", "GET"])
+def upload_file():
     if request.method == "POST":
         try:
             # Recieve new book from API
             #print(request.files['upload_book'].filename)
-            if 'upload_book' in request.files:
-                print(request.files['upload_book'])
-                resp = save_book(app.config["BOOKS_PATH"], request.files['upload_book'])
+            if 'upload_file' in request.files:
+                print(request.files['upload_file'])
+                if '.txt' in request.files['upload_file'].filename:
+                    resp = save_book(app.config["BOOKS_PATH"], request.files['upload_file'])
+                elif '.wav' in request.files['upload_file'].filename:
+                    print('SPEAKER')
+                    resp = save_speaker(app.config["SPEAKERS_PATH"], request.files['upload_file'])
+                else:
+                    print('RVC')
+                # resp = save_book(app.config["BOOKS_PATH"], request.files['upload_book'])
         except:
             return jsonify({'message': 'No Book', 'success': False})
-    
+
     return resp
 
 
@@ -59,19 +66,19 @@ def upload_book():
 @app.route('/load_selected_book', methods=['GET'])
 def load_selected():
     selected_book = request.args.get('selected_book')
-    
+
     print(selected_book)
     try:
         book_content = load_selected_book(app.config["BOOKS_PATH"], selected_book)
 
     except Exception as e:
         return jsonify({'message': 'Error reading book', 'success': False, 'error': e, 'data': []})
-    
+
     result = jsonify({'message': 'Book loaded succesfully', 'success': True, 'error': '', 'data': book_content})
     print('RESULT: ', result.get_data(as_text=True))
 
     return result
-    
+
 
 # Generate audio
 

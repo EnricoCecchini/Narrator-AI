@@ -5,7 +5,7 @@
     import { API_ROUTE } from "../requests/api";
 
     import {load_existing_files} from '../requests/load_existing_data'
-    import {upload_book} from '../requests/upload_files'
+    import {upload_book, upload_file} from '../requests/upload_files'
     import {load_book} from '../requests/load_book'
 
     import {existing_books, existing_speakers, existing_rvc} from '../../static/store'
@@ -26,7 +26,7 @@
         handleParseOptions()
         loadSelectedStore()
     })
-    
+
     const loadSelectedStore = async () => {
         selected_book.subscribe(value => {
             selected_book_option = value
@@ -44,10 +44,10 @@
     const handleParseOptions = () => {
         available_books = JSON.parse($existing_books)
         console.log("PARSED BOOKS", available_books)
-        
+
         available_speakers = JSON.parse($existing_speakers)
         available_rvc = JSON.parse($existing_rvc)
-        available_audiobooks = []   
+        available_audiobooks = []
     }
 
     const handleUploadBook = async (event) => {
@@ -61,6 +61,26 @@
             const response = await upload_book(new_book)
         } else {
             console.log("NO BOOK UPLOADED")
+        }
+
+        loadSelectedStore()
+        handleParseOptions()
+    }
+
+    const handleUploadFile = async (event) => {
+        event.preventDefault()
+
+        const file_event = event.target.upload_file.files[0]
+        console.log('FILE EVENT', file_event.name)
+
+        // Make form data to POST
+        const new_file = new FormData(event.target)
+
+        if (new_file) {
+            console.log('FILE NAME', new_file)
+            const response = await upload_file(new_file)
+        } else {
+            console.log("NO FILE UPLOADED")
         }
 
         loadSelectedStore()
@@ -104,11 +124,11 @@
     const handleSelectBook = async (event) => {
         console.log(event.target.value)
         selected_book.set(event.target.value)
-        
+
         const response = await load_book(event.target.value)
-        
+
         const selected_book_content = response.data
-        
+
         console.log(selected_book_content)
     }
 
@@ -177,32 +197,36 @@
     <div class="options-group">
         <!-- Upload Book -->
         <div class="options-column">
-            <form on:submit|preventDefault={handleUploadBook}>
+            <form on:submit|preventDefault={handleUploadFile}>
+            <!-- <form on:submit|preventDefault={handleUploadBook}> -->
                 <div class="options-col-row">
                     <label for="upload_file" class="option-label">Upload Book</label>
                 </div>
                 <div class="options-col-row">
-                    <input class="upload_file" type="file" accept=".txt" name="upload_book" id="upload_book">
+                    <!-- <input class="upload_file" type="file" accept=".txt" name="upload_book" id="upload_book"> -->
+                    <input class="upload_file" type="file" accept=".txt" name="upload_file" id="upload_file">
                     <button type="submit">Submit</button>
                 </div>
             </form>
 
-            <form on:submit|preventDefault={handleUploadSpeaker}>
+            <form on:submit|preventDefault={handleUploadFile}>
                 <div class="options-col-row">
                     <label for="upload_file" class="option-label">Upload Speaker</label>
                 </div>
                 <div class="options-col-row">
-                    <input class="upload_file" type="file" accept=".wav" name="upload_speaker" id="upload_speaker">
+                    <!-- <input class="upload_file" type="file" accept=".wav" name="upload_speaker" id="upload_speaker"> -->
+                    <input class="upload_file" type="file" accept=".wav" name="upload_file" id="upload_file">
                     <button type="submit">Submit</button>
                 </div>
             </form>
 
-            <form on:submit|preventDefault={handleUploadRVC}>
+            <form on:submit|preventDefault={handleUploadFile}>
                 <div class="options-col-row">
                     <label for="upload_file" class="option-label">Upload RVC</label>
                 </div>
                 <div class="options-col-row">
-                    <input class="upload_file" type="file" accept=".txt" name="upload_RVC" id="upload_RVC">
+                    <!-- <input class="upload_file" type="file" accept=".txt" name="upload_RVC" id="upload_RVC"> -->
+                    <input class="upload_file" type="file" accept=".txt" name="upload_file" id="upload_file">
                     <button type="submit">Submit</button>
                 </div>
             </form>

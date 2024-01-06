@@ -28,6 +28,7 @@ static/books/*
 static/audiobooks/*
 static/speakers/*
 static/rvc_models/*
+test
 
 # Ignore python venv
 API/venv

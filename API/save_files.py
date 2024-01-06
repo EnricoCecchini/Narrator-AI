@@ -9,27 +9,36 @@ def save_book(BOOKS_PATH, book):
     # If path exists, return error
     if os.path.exists(new_book_path):
         return {"message": "Book already exists", "success": False}
-    
+
     else:
         os.makedirs(new_book_path)
         os.makedirs(processed_path)
-    
+
     # Save OG book
     book.save(os.path.join(new_book_path, book.filename))
 
     # Read book and split into lines in separate files in Processed dir
     with open(os.path.join(new_book_path, book.filename), 'r', encoding='utf-8') as file:
         lines = file.readlines()
-        
+
         # Skip empty lines
         lines = [l for l in lines if len(l.replace('\n', '')) > 0]
-        
+
         for i, line in enumerate(lines):
             with open(os.path.join(processed_path, f"{i}.txt"), 'w', encoding='utf-8') as f:
                 f.write(line)
-    
+
     return {"message": "Book uploaded and processed succesfully", "success": True}
 
 # Save speaker in speakers dir
-def save_speaker():
-    pass
+def save_speaker(SPEAKERS_PATH, speaker):
+    new_speaker_path = os.path.join(SPEAKERS_PATH, speaker.filename)
+
+    # If path exists, return error
+    if os.path.exists(new_speaker_path):
+        return {"message": "Speaker already exists", "success": False}
+
+    else:
+        speaker.save(new_speaker_path)
+
+    return {"message": "Speaker uploaded succesfully", "success": True}
