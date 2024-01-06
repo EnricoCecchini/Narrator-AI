@@ -76,12 +76,8 @@
 
         const response = await load_book(event.target.value)
 
-        //console.log(response.data)
-
         // Save lines from selected book in store
         selected_book_lines.set(response.data)
-
-        console.log('SELECTED BOOK LINES: ', $selected_book_lines)
     }
 
     const handleSelectSpeaker = async (event) => {

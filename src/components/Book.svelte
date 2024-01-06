@@ -6,7 +6,6 @@
 
     const unsubscribe = selected_book_lines.subscribe(value => {
         book_lines = value
-        console.log('BOOK LINES: ', book_lines)
     })
 
     onDestroy(() => {
