@@ -70,3 +70,65 @@
   display: flex;
   flex-direction: column;
 }
+
+.book-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1vw;
+  border-radius: 0.5vw;
+  background-color: #242424;
+  color: white;
+}
+
+.book-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid #ddd;
+}
+
+.book-table-header-row {
+  padding: 1vw;
+  text-align: left;
+  background-color: #242424;
+  color: white;
+}
+
+.book-table-header-line {
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #242424;
+  color: white;
+  width: 90%;
+}
+
+.book-table-header-options {
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #242424;
+  color: white;
+}
+
+.book-table-line-number {
+  text-align: left;
+  font-size: 16px;
+  width: fit-content;
+  padding: .5vw;
+}
+
+.book-table-row {
+  padding: 1vw;
+  text-align: left;
+  border: 1px solid #ddd;
+  height: fit-content;
+}
+
+.book-table-text {
+  text-align: left;
+  font-size: 16px;
+  width: 95%;
+  height: fit-content;
+}

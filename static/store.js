@@ -8,3 +8,5 @@ export const existing_audiobooks = writable(localStorage.getItem('existing_audio
 export const selected_book = writable('')
 export const selected_speaker = writable('')
 export const selected_rvc = writable('')
+
+export const selected_book_lines = writable([])

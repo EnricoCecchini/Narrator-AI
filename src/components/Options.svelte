@@ -5,11 +5,12 @@
     import { API_ROUTE } from "../requests/api";
 
     import {load_existing_files} from '../requests/load_existing_data'
-    import {upload_book, upload_file} from '../requests/upload_files'
+    import {upload_file} from '../requests/upload_files'
     import {load_book} from '../requests/load_book'
 
     import {existing_books, existing_speakers, existing_rvc} from '../../static/store'
     import {selected_book, selected_speaker, selected_rvc} from '../../static/store'
+    import {selected_book_lines} from '../../static/store'
 
     let available_books = []
     let available_speakers = []
@@ -19,6 +20,8 @@
     let selected_book_option = ''
     let selected_speaker_option = ''
     let selected_rvc_option = ''
+
+    let current_selected_book_lines = []
 
     onMount(async () => {
         load_existing_files()
@@ -50,28 +53,8 @@
         available_audiobooks = []
     }
 
-    const handleUploadBook = async (event) => {
-        event.preventDefault()
-
-        // Make form data to POST
-        const new_book = new FormData(event.target)
-
-        if (new_book) {
-            console.log('BOOK NAME', new_book)
-            const response = await upload_book(new_book)
-        } else {
-            console.log("NO BOOK UPLOADED")
-        }
-
-        loadSelectedStore()
-        handleParseOptions()
-    }
-
     const handleUploadFile = async (event) => {
         event.preventDefault()
-
-        const file_event = event.target.upload_file.files[0]
-        console.log('FILE EVENT', file_event.name)
 
         // Make form data to POST
         const new_file = new FormData(event.target)
@@ -87,58 +70,31 @@
         handleParseOptions()
     }
 
-    const handleUploadSpeaker = async (event) => {
-        event.preventDefault()
-
-        // Make form data to POST
-        const new_speaker = new FormData(event.target)
-
-        if (new_speaker) {
-            console.log('SPEAKER NAME', new_speaker)
-            const response = await upload_book(new_speaker)
-        } else {
-            console.log("NO BOOK UPLOADED")
-        }
-
-        loadSelectedStore()
-        handleParseOptions()
-    }
-
-    const handleUploadRVC = async (event) => {
-        event.preventDefault()
-
-        // Make form data to POST
-        const new_RVC = new FormData(event.target)
-
-        if (new_RVC) {
-            console.log('SPEAKER NAME', new_RVC)
-            const response = await upload_book(new_RVC)
-        } else {
-            console.log("NO BOOK UPLOADED")
-        }
-
-        loadSelectedStore()
-        handleParseOptions()
-    }
-
     const handleSelectBook = async (event) => {
         console.log(event.target.value)
         selected_book.set(event.target.value)
 
         const response = await load_book(event.target.value)
 
-        const selected_book_content = response.data
+        //console.log(response.data)
 
-        console.log(selected_book_content)
+        // Save lines from selected book in store
+        selected_book_lines.set(response.data)
+
+        console.log('SELECTED BOOK LINES: ', $selected_book_lines)
     }
 
     const handleSelectSpeaker = async (event) => {
         console.log(event.target.value)
+
+        // Set selected speaker in store
         selected_speaker.set(event.target.value)
     }
 
     const handleSelectRVC = async (event) => {
         console.log(event.target.value)
+
+        // Set selected RVC in store
         selected_rvc.set(event.target.value)
     }
 
