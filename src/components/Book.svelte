@@ -32,17 +32,8 @@
 
     // Delete selected line
     const handleDeleteLine = async (index) => {
-        const data = {
-            index: index,
-            book: $selected_book,
-        }
-
         book_lines.splice(index, 1)
-
         selected_book_lines.set(book_lines)
-
-        // Delete line from book_lines
-        console.log('DELETE: ', data)
     }
 
     // Play selected line
@@ -58,10 +49,10 @@
     // Add line below selected line
     const handleAddLineBelow = async (index) => {
         book_lines.splice(index + 1, 0, '')
-
         selected_book_lines.set(book_lines)
     }
 
+    // Move selected line up
     const handleMoveLineUp = async (index) => {
         let tempLine = book_lines[index]
 
@@ -71,6 +62,7 @@
         selected_book_lines.set(book_lines)
     }
 
+    // Move selected line down
     const handleMoveLineDown = async (index) => {
         let tempLine = book_lines[index]
 
@@ -80,10 +72,8 @@
         selected_book_lines.set(book_lines)
     }
 
+    // Undo unsaved changes by reloading lines from selected book
     const handleUndoChanges = async () => {
-        console.log('UNDO: ', $selected_book)
-        //selected_book.set(event.target.value)
-
         const response = await load_book($selected_book)
 
         // Save lines from selected book in store
