@@ -1,15 +1,35 @@
 <script>
     import { onDestroy } from 'svelte';
-    import {selected_book_lines} from '../../static/store'
+
+    import {    selected_book_lines,
+                selected_book,
+                selected_speaker,
+                selected_rvc
+    } from '../../static/store'
+
+    import { narrate_line } from '../requests/narrate_line'
 
     let book_lines = []
 
-    const unsubscribe = selected_book_lines.subscribe(value => {
+    const unsubscribeSelectedLines = selected_book_lines.subscribe(value => {
         book_lines = value
     })
 
+    const handleNarrateLine = async (line, index) => {
+        const data = {
+            line: line,
+            index: index,
+            book: $selected_book,
+            speaker: $selected_speaker,
+            rvc_model: $selected_rvc
+        }
+
+        console.log(data)
+        const audio = await narrate_line(data)
+    }
+
     onDestroy(() => {
-        unsubscribe()
+        unsubscribeSelectedLines()
     })
 
 </script>
@@ -28,7 +48,7 @@
                     <textarea class="book-table-text" value={line} />
                 </td>
                 <td>
-                    <button class="book-button">Regenerate</button>
+                    <button class="book-button" on:click={handleNarrateLine(line, i)}>Regenerate</button>
                     <button class="book-button">Play</button>
                     <button class="book-button">Delete</button>
                 </td>

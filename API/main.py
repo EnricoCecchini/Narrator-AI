@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
+from rich import print
 
 from load_files import load_speakers, load_books, load_audiobooks, load_rvc_models, load_selected_book
 from save_files import save_book, save_speaker
@@ -94,7 +95,9 @@ def narrate_line():
         book = data["book"]
         line = data["line"]
         rvc_model = data["rvc_model"]
-        output_file = data["output_file"]
+        index = data["index"]
+
+    return jsonify({'message': 'Line narrated succesfully', 'success': True, 'error': '', 'data': []})
 
 
 # Narrate entire book
