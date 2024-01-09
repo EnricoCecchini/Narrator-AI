@@ -10,9 +10,8 @@ def save_book(BOOKS_PATH, book):
     if os.path.exists(new_book_path):
         return {"message": "Book already exists", "success": False}
 
-    else:
-        os.makedirs(new_book_path)
-        os.makedirs(processed_path)
+    os.makedirs(new_book_path)
+    os.makedirs(processed_path)
 
     # Save OG book
     book.save(os.path.join(new_book_path, book.filename))
@@ -30,6 +29,38 @@ def save_book(BOOKS_PATH, book):
 
     return {
         "message": "Book uploaded and processed succesfully",
+        "success": True
+    }
+
+
+def update_book(BOOKS_PATH, data):
+    update_book_path = os.path.join(BOOKS_PATH, data["book"])
+
+    print("UPDATE BOOK PATH: ", update_book_path)
+
+    if not os.path.exists(update_book_path):
+        return {
+            "message": "Book does not exist",
+            "success": False
+        }
+
+    # Delete from Processed dir
+    for file in os.listdir(os.path.join(update_book_path, "Processed")):
+        os.remove(os.path.join(update_book_path, "Processed", file))
+
+    # Delete book
+    os.remove(os.path.join(update_book_path, f'{data["book"]}.txt'))
+
+    for i, line in enumerate(data["lines"]):
+        with open(os.path.join(update_book_path, "Processed", f"{i}.txt"), 'w', encoding='utf-8') as f:
+            f.write(line)
+
+        # Append to book
+        with open(os.path.join(update_book_path, f'{data["book"]}.txt'), 'a', encoding='utf-8') as f:
+            f.write(line)
+
+    return {
+        "message": "Book updated succesfully",
         "success": True
     }
 

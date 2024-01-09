@@ -5,7 +5,7 @@ import os
 from rich import print
 
 from load_files import load_speakers, load_books, load_audiobooks, load_rvc_models, load_selected_book, load_index_files
-from save_files import save_book, save_speaker, save_rvc, save_index
+from save_files import save_book, save_speaker, save_rvc, save_index, update_book
 
 load_dotenv()
 
@@ -126,6 +126,40 @@ def narrate_entire_audiobook():
         book = data["book"]
         rvc_model = data["rvc_model"]
         output_file = data["output_file"]
+
+
+@app.route('/save_book_changes', methods=['POST'])
+def save_book_changes():
+    data = request.get_json()
+
+    print('SAVE BOOK CHANGES: ', data)
+
+    if data['book'] == '':
+        return jsonify({
+            'message': 'No Book',
+            'success': False,
+            'error': '',
+            'data': []
+        })
+
+    elif data['lines'] == []:
+        return jsonify({
+            'message': 'No Lines',
+            'success': False,
+            'error': '',
+            'data': []
+        })
+
+    update_book(app.config["BOOKS_PATH"], data)
+
+    print('BOOK SAVED')
+
+    return jsonify({
+        'message': 'Book updates succesfully',
+        'success': True,
+        'error': '',
+        'data': []
+    })
 
 # Run app
 if __name__ == "__main__":

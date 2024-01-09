@@ -9,6 +9,7 @@
 
     import { narrate_line } from '../requests/narrate_line'
     import {load_book} from '../requests/load_book'
+    import {save_book_changes} from '../requests/save_book_changes'
 
     let book_lines = []
 
@@ -77,6 +78,16 @@
         selected_book_lines.set(book_lines)
     }
 
+    // Save changes to book
+    const handleSaveChanges = async () => {
+        const data = {
+            book: $selected_book,
+            lines: book_lines
+        }
+
+        const response = await save_book_changes(data)
+    }
+
     // Undo unsaved changes by reloading lines from selected book
     const handleUndoChanges = async () => {
         const response = await load_book($selected_book)
@@ -129,8 +140,8 @@
             <button class="book-options-button">Narrate All</button>
             <button class="book-options-button">Play All</button>
             <button class="book-options-button">Pause</button>
-            <button class="book-options-button restore" on:click={handleUndoChanges}>Undo Changes</button>
-            <button class="book-options-button save">Save Changes</button>
+            <button class="book-options-button restore" on:click={() => {handleUndoChanges()}}>Undo Changes</button>
+            <button class="book-options-button save" on:click={() => {handleSaveChanges()}}>Save Changes</button>
         </div>
         <div class="voice-settings-container">
             <div class="voice-settings-row">
