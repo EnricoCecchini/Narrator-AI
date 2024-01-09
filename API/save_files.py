@@ -28,7 +28,11 @@ def save_book(BOOKS_PATH, book):
             with open(os.path.join(processed_path, f"{i}.txt"), 'w', encoding='utf-8') as f:
                 f.write(line)
 
-    return {"message": "Book uploaded and processed succesfully", "success": True}
+    return {
+        "message": "Book uploaded and processed succesfully",
+        "success": True
+    }
+
 
 # Save speaker in speakers dir
 def save_speaker(SPEAKERS_PATH, speaker):
@@ -36,9 +40,55 @@ def save_speaker(SPEAKERS_PATH, speaker):
 
     # If path exists, return error
     if os.path.exists(new_speaker_path):
-        return {"message": "Speaker already exists", "success": False}
+        return {
+            "message": "Speaker already exists",
+            "success": False
+        }
 
     else:
         speaker.save(new_speaker_path)
 
-    return {"message": "Speaker uploaded succesfully", "success": True}
+    return {
+        "message": "Speaker uploaded succesfully",
+        "success": True
+    }
+
+
+# Save RVC model in RVC dir
+def save_rvc(RVC_PATH, rvc):
+    new_rvc_path = os.path.join(RVC_PATH, rvc.filename)
+
+    # If path exists, return error
+    if os.path.exists(new_rvc_path):
+        return {
+            "message": "RVC model already exists",
+            "success": False
+        }
+
+    else:
+        rvc.save(new_rvc_path)
+
+    return {
+        "message": "RVC model uploaded succesfully",
+        "success": True
+    }
+
+
+# Save index in indexes dir
+def save_index(INDEX_PATH, index):
+    new_index_path = os.path.join(INDEX_PATH, index.filename)
+
+    # If path exists, return error
+    if os.path.exists(new_index_path):
+        return {
+            "message": "Index already exists",
+            "success": False
+        }
+
+    else:
+        index.save(new_index_path)
+
+    return {
+        "message": "Index uploaded succesfully",
+        "success": True
+    }

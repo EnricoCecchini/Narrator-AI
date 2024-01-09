@@ -124,11 +124,24 @@
             {/each}
         </table>
     </div>
-    <div class="book-options">
-        <button class="book-options-button">Narrate All</button>
-        <button class="book-options-button">Play All</button>
-        <button class="book-options-button">Pause</button>
-        <button class="book-options-button restore" on:click={handleUndoChanges}>Undo Changes</button>
-        <button class="book-options-button save">Save Changes</button>
+    <div class="generation-settings">
+        <div class="book-options">
+            <button class="book-options-button">Narrate All</button>
+            <button class="book-options-button">Play All</button>
+            <button class="book-options-button">Pause</button>
+            <button class="book-options-button restore" on:click={handleUndoChanges}>Undo Changes</button>
+            <button class="book-options-button save">Save Changes</button>
+        </div>
+        <div class="voice-settings-container">
+            <div class="voice-settings-row">
+                <label for="voice-settings" class="voice-settings-label">Index Effect</label>
+                <input type="range" min="0" max="100" value="50" class="voice-settings-slider" id="volume-slider">
+            </div>
+
+            <div class="voice-settings-row">
+                <label for="voice-settings" class="voice-settings-label">Voice Pitch</label>
+                <input type="range" min="0" max="100" value="50" class="voice-settings-slider" id="volume-slider">
+            </div>
+        </div>
     </div>
 </div>

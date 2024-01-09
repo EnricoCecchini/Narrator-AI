@@ -1,6 +1,6 @@
 import { API_ROUTE } from "./api";
 
-export function upload_file(new_file) {
+export const upload_file = async (new_file) => {
     console.log(new_file)
 
     return fetch(API_ROUTE + '/upload_file', {

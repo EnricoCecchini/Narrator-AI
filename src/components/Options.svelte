@@ -8,24 +8,26 @@
     import {upload_file} from '../requests/upload_files'
     import {load_book} from '../requests/load_book'
 
-    import {existing_books, existing_speakers, existing_rvc} from '../../static/store'
-    import {selected_book, selected_speaker, selected_rvc} from '../../static/store'
+    import {existing_books, existing_speakers, existing_rvc, existing_rvc_index} from '../../static/store'
+    import {selected_book, selected_speaker, selected_rvc, selected_index} from '../../static/store'
     import {selected_book_lines} from '../../static/store'
 
     let available_books = []
     let available_speakers = []
     let available_rvc = []
-    let available_audiobooks = []
+    let available_indexes = []
 
     let selected_book_option = ''
     let selected_speaker_option = ''
     let selected_rvc_option = ''
+    let selected_index_option = ''
 
 
     onMount(async () => {
-        load_existing_files()
+        await load_existing_files()
         console.log('BOOKS EXISTING: ', $existing_books)
-        handleParseOptions()
+
+        await handleParseOptions()
         loadSelectedStore()
     })
 
@@ -41,15 +43,17 @@
         selected_rvc.subscribe(value => {
             selected_rvc_option = value
         })
+
+        selected_index.subscribe(value => {
+            selected_index_option = value
+        })
     }
 
-    const handleParseOptions = () => {
+    const handleParseOptions = async () => {
         available_books = JSON.parse($existing_books)
-        console.log("PARSED BOOKS", available_books)
-
         available_speakers = JSON.parse($existing_speakers)
         available_rvc = JSON.parse($existing_rvc)
-        available_audiobooks = []
+        available_indexes = JSON.parse($existing_rvc_index)
     }
 
     const handleUploadFile = async (event) => {
@@ -65,8 +69,10 @@
             console.log("NO FILE UPLOADED")
         }
 
+        await load_existing_files()
+        await handleParseOptions()
+
         loadSelectedStore()
-        handleParseOptions()
     }
 
     const handleSelectBook = async (event) => {
@@ -142,45 +148,74 @@
                     </select>
                 </div>
             </div>
+
+            <!-- Select RVC Model -->
+            <div class="options-column">
+                <div class="options-col-row">
+                    <label for="speakers" class="option-label">Select Index</label>
+                </div>
+                <div class="options-col-row">
+                    <select class="option-dropdown" name='speakers' id='speakers'  on:change={handleSelectRVC}>
+                        <option value='' class="options-option">Select Index</option>
+                        {#each available_indexes as index}
+                            <option value={index}>{index}</option>
+                        {/each}
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="options-group-upload">
         <!-- Upload Book -->
         <div class="options-column">
-            <form on:submit|preventDefault={handleUploadFile}>
-            <!-- <form on:submit|preventDefault={handleUploadBook}> -->
-                <div class="options-col-row">
-                    <label for="upload_file" class="option-label">Upload Book</label>
-                </div>
-                <div class="options-col-row">
-                    <!-- <input class="upload_file" type="file" accept=".txt" name="upload_book" id="upload_book"> -->
-                    <input class="upload_file" type="file" accept=".txt" name="upload_file" id="upload_file">
-                    <button type="submit">Submit</button>
-                </div>
-            </form>
+            <div class="options-column-row">
+                <form on:submit|preventDefault={handleUploadFile}>
+                <!-- <form on:submit|preventDefault={handleUploadBook}> -->
+                    <div class="options-col-row">
+                        <label for="upload_file" class="option-label">Upload Book</label>
+                    </div>
+                    <div class="options-col-row">
+                        <!-- <input class="upload_file" type="file" accept=".txt" name="upload_book" id="upload_book"> -->
+                        <input class="upload_file" type="file" accept=".txt" name="upload_file" id="upload_file">
+                        <button type="submit">Submit</button>
+                    </div>
+                </form>
 
-            <form on:submit|preventDefault={handleUploadFile}>
-                <div class="options-col-row">
-                    <label for="upload_file" class="option-label">Upload Speaker</label>
-                </div>
-                <div class="options-col-row">
-                    <!-- <input class="upload_file" type="file" accept=".wav" name="upload_speaker" id="upload_speaker"> -->
-                    <input class="upload_file" type="file" accept=".wav" name="upload_file" id="upload_file">
-                    <button type="submit">Submit</button>
-                </div>
-            </form>
+                <form on:submit|preventDefault={handleUploadFile}>
+                    <div class="options-col-row">
+                        <label for="upload_file" class="option-label">Upload Speaker</label>
+                    </div>
+                    <div class="options-col-row">
+                        <!-- <input class="upload_file" type="file" accept=".wav" name="upload_speaker" id="upload_speaker"> -->
+                        <input class="upload_file" type="file" accept=".wav" name="upload_file" id="upload_file">
+                        <button type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
 
-            <form on:submit|preventDefault={handleUploadFile}>
-                <div class="options-col-row">
-                    <label for="upload_file" class="option-label">Upload RVC</label>
-                </div>
-                <div class="options-col-row">
-                    <!-- <input class="upload_file" type="file" accept=".txt" name="upload_RVC" id="upload_RVC"> -->
-                    <input class="upload_file" type="file" accept=".txt" name="upload_file" id="upload_file">
-                    <button type="submit">Submit</button>
-                </div>
-            </form>
+            <div class="options-column-row">
+                <form on:submit|preventDefault={handleUploadFile}>
+                    <div class="options-col-row">
+                        <label for="upload_file" class="option-label">Upload RVC</label>
+                    </div>
+                    <div class="options-col-row">
+                        <!-- <input class="upload_file" type="file" accept=".txt" name="upload_RVC" id="upload_RVC"> -->
+                        <input class="upload_file" type="file" accept=".pth" name="upload_file" id="upload_file">
+                        <button type="submit">Submit</button>
+                    </div>
+                </form>
+
+                <form on:submit|preventDefault={handleUploadFile}>
+                    <div class="options-col-row">
+                        <label for="upload_file" class="option-label">Upload Index</label>
+                    </div>
+                    <div class="options-col-row">
+                        <input class="upload_file" type="file" accept=".index" name="upload_file" id="upload_file">
+                        <button type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

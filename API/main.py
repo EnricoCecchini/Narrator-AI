@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 import os
 from rich import print
 
-from load_files import load_speakers, load_books, load_audiobooks, load_rvc_models, load_selected_book
-from save_files import save_book, save_speaker
+from load_files import load_speakers, load_books, load_audiobooks, load_rvc_models, load_selected_book, load_index_files
+from save_files import save_book, save_speaker, save_rvc, save_index
 
 load_dotenv()
 
@@ -18,6 +18,7 @@ app.config["BOOKS_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'books')
 app.config["SPEAKERS_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'speakers')
 app.config["AUDIOBOOKS_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'audiobooks')
 app.config["RVC_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'rvc_models')
+app.config["INDEX_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'index')
 
 
 # Load existing data
@@ -29,12 +30,14 @@ def load_existing_items():
     books = load_books(app.config["BOOKS_PATH"])
     audiobooks = load_audiobooks(app.config["AUDIOBOOKS_PATH"])
     rvc_models = load_rvc_models(app.config["RVC_PATH"])
+    indexes = load_index_files(app.config["INDEX_PATH"])
 
     resp = jsonify({
         "speakers": speakers,
         "books": books,
         "audiobooks": audiobooks,
-        "rvc_models": rvc_models
+        "rvc_models": rvc_models,
+        "indexes": indexes
     })
 
     print(resp)
@@ -46,17 +49,28 @@ def upload_file():
     if request.method == "POST":
         try:
             # Recieve new book from API
-            #print(request.files['upload_book'].filename)
             if 'upload_file' in request.files:
                 print(request.files['upload_file'])
                 if '.txt' in request.files['upload_file'].filename:
                     resp = save_book(app.config["BOOKS_PATH"], request.files['upload_file'])
+
                 elif '.wav' in request.files['upload_file'].filename:
                     print('SPEAKER')
                     resp = save_speaker(app.config["SPEAKERS_PATH"], request.files['upload_file'])
-                else:
+
+                elif '.pth' in request.files['upload_file'].filename:
                     print('RVC')
-                # resp = save_book(app.config["BOOKS_PATH"], request.files['upload_book'])
+                    resp = save_rvc(app.config["RVC_PATH"], request.files['upload_file'])
+
+                elif '.index' in request.files['upload_file'].filename:
+                    print('INDEX')
+                    resp = save_index(app.config["INDEX_PATH"], request.files['upload_file'])
+
+                else:
+                    return jsonify({
+                        'message': 'Invalid file type',
+                        'success': False
+                    })
         except:
             return jsonify({'message': 'No Book', 'success': False})
 

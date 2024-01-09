@@ -44,6 +44,19 @@
   margin: auto;
 }
 
+.options-column-row {
+  display:flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: fit-content;
+  margin: auto;
+}
+
+.options-col-row {
+  width: fit-content;
+  margin: auto;
+}
+
 .options-option {
   padding: .5vw;
 }
@@ -172,6 +185,12 @@
   font-weight: bold;
 }
 
+.generation-settings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .book-options {
   margin-left: 5vw;
 }
@@ -201,4 +220,23 @@
   justify-content: center;
   width: fit-content;
   margin: 1vw;
+}
+
+.voice-settings-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding-top: 5vh;
+}
+
+.voice-settings-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 100%;
+}
+
+.voice-settings-slider {
+  width: 50%;
 }

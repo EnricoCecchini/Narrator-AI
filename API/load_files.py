@@ -37,11 +37,23 @@ def load_audiobooks(AUDIOBOOKS_PATH):
 def load_rvc_models(RVC_PATH):
     rvc_models = []
     for file in os.listdir(RVC_PATH):
-        rvc_models.append(file)
+        if file.endswith(".pth"):
+            rvc_models.append(file)
 
     print(RVC_PATH, rvc_models)
 
     return rvc_models
+
+# Load list of index files in dir
+def load_index_files(INDEX_PATH):
+    index_files = []
+    for file in os.listdir(INDEX_PATH):
+        if file.endswith(".index"):
+            index_files.append(file)
+
+    print(INDEX_PATH, index_files)
+
+    return index_files
 
 
 # Load lines in selected book
