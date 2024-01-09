@@ -97,7 +97,7 @@
 </script>
 
 <div class="options-container">
-    <div class="options-group">
+    <div class="options-group-narrator">
         <div class="options-row">
             <!-- Select Book -->
             <div class="options-column">
@@ -146,7 +146,7 @@
         </div>
     </div>
 
-    <div class="options-group">
+    <div class="options-group-upload">
         <!-- Upload Book -->
         <div class="options-column">
             <form on:submit|preventDefault={handleUploadFile}>
