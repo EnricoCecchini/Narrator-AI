@@ -57,7 +57,7 @@ def update_book(BOOKS_PATH, data):
 
         # Append to book
         with open(os.path.join(update_book_path, f'{data["book"]}.txt'), 'a', encoding='utf-8') as f:
-            f.write(line)
+            f.write(f'{line}\n')
 
     return {
         "message": "Book updated succesfully",

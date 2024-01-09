@@ -115,7 +115,7 @@
                 <tr class="book-table-row">
                     <td class="book-table-line-number">{i}</td>
                     <td>
-                        <textarea class="book-table-text" value={line} />
+                        <textarea class="book-table-text" bind:value={line}/>
                     </td>
                     <td>
                         <button class="book-line-button" on:click={() => handleNarrateLine(line, i)}>Narrate Line</button>
