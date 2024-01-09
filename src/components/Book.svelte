@@ -37,6 +37,10 @@
             book: $selected_book,
         }
 
+        book_lines.splice(index, 1)
+
+        selected_book_lines.set(book_lines)
+
         // Delete line from book_lines
         console.log('DELETE: ', data)
     }
