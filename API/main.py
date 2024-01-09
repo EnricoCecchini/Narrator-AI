@@ -68,7 +68,7 @@ def upload_file():
 def load_selected():
     selected_book = request.args.get('selected_book')
 
-    print(selected_book)
+    print('LOAD SELECTED BOOK', selected_book)
     try:
         book_content = load_selected_book(app.config["BOOKS_PATH"], selected_book)
 

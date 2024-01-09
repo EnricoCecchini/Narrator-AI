@@ -26,6 +26,11 @@
             rvc_model: $selected_rvc
         }
 
+        if (data.speaker === '') {
+            alert('Please select a speaker')
+            return
+        }
+
         console.log(data)
         const audio = await narrate_line(data)
     }

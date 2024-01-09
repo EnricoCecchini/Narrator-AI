@@ -21,7 +21,6 @@
     let selected_speaker_option = ''
     let selected_rvc_option = ''
 
-    let current_selected_book_lines = []
 
     onMount(async () => {
         load_existing_files()
