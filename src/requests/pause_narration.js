@@ -1,18 +1,17 @@
 import { API_ROUTE } from "./api";
 
-export const save_book_changes = async (book_data) => {
-    console.log('CHANGES: ', book_data)
+export const pause_narration = async () => {
+    console.log('PAUSING NARRATION')
 
-    return fetch(API_ROUTE + '/save_book_changes', {
+    const resp = await fetch(API_ROUTE + '/pause_narration', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(book_data)
+        }
     })
     .then(response => response.json())
     .then(data => {
-        console.log('SAVE: ', data)
+        console.log(data)
         return data
     })
     .catch(e => {

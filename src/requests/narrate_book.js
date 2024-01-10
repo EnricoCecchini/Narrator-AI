@@ -1,9 +1,9 @@
 import { API_ROUTE } from "./api";
 
-export const save_book_changes = async (book_data) => {
-    console.log('CHANGES: ', book_data)
+export const narrate_book = async (book_data) => {
+    console.log('BOOK: ', book_data)
 
-    return fetch(API_ROUTE + '/save_book_changes', {
+    return fetch(API_ROUTE + '/narrate_entire_audiobook', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -12,7 +12,7 @@ export const save_book_changes = async (book_data) => {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('SAVE: ', data)
+        console.log(data)
         return data
     })
     .catch(e => {

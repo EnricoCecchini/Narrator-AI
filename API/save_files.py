@@ -48,6 +48,11 @@ def update_book(BOOKS_PATH, data):
     for file in os.listdir(os.path.join(update_book_path, "Processed")):
         os.remove(os.path.join(update_book_path, "Processed", file))
 
+    # Delete audios by index
+    for line in data["lines"]:
+        #os.remove(os.path.join(update_book_path, "Audio", f"{line}.wav"))
+        pass
+
     # Delete book
     os.remove(os.path.join(update_book_path, f'{data["book"]}.txt'))
 

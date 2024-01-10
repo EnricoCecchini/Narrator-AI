@@ -4,17 +4,21 @@
     import {    selected_book_lines,
                 selected_book,
                 selected_speaker,
-                selected_rvc
+                selected_rvc,
+                selected_index
     } from '../../static/store'
 
     import { narrate_line } from '../requests/narrate_line'
-    import {load_book} from '../requests/load_book'
-    import {save_book_changes} from '../requests/save_book_changes'
+    import { load_book } from '../requests/load_book'
+    import { save_book_changes } from '../requests/save_book_changes'
+    import { narrate_book } from '../requests/narrate_book'
+    import { pause_narration } from '../requests/pause_narration'
 
     let book_lines = []
 
     const unsubscribeSelectedLines = selected_book_lines.subscribe(value => {
         book_lines = value
+        console.log('BOOK LINES: ', book_lines)
     })
 
     // Narrate selected line
@@ -54,7 +58,7 @@
 
     // Add line below selected line
     const handleAddLineBelow = async (index) => {
-        book_lines.splice(index + 1, 0, '')
+        book_lines.splice(index + 1, 0, {'line': '', 'path': ''})
         selected_book_lines.set(book_lines)
     }
 
@@ -78,6 +82,38 @@
         selected_book_lines.set(book_lines)
     }
 
+    // Begin Book Narration
+    const handleNarrateBook = async () => {
+
+        let resp = await handleSaveChanges()
+
+        console.log('RESP', resp)
+
+        if (!resp.success) {
+            alert('Please save changes before narrating book')
+
+            return
+        }
+
+        const data = {
+            book: $selected_book,
+            speaker: $selected_speaker,
+            rvc_model: $selected_rvc,
+            index: $selected_index
+        }
+
+        console.log('BEGIN NARRATION: ', data)
+
+        const response = await narrate_book(data)
+    }
+
+    // Pause Book Narration
+    const handlePauseNarration = async () => {
+        console.log('PAUSE NARRATION')
+
+        const response = await pause_narration()
+    }
+
     // Save changes to book
     const handleSaveChanges = async () => {
         const data = {
@@ -86,6 +122,8 @@
         }
 
         const response = await save_book_changes(data)
+
+        return response
     }
 
     // Undo unsaved changes by reloading lines from selected book
@@ -115,7 +153,7 @@
                 <tr class="book-table-row">
                     <td class="book-table-line-number">{i}</td>
                     <td>
-                        <textarea class="book-table-text" bind:value={line}/>
+                        <textarea class="book-table-text" bind:value={line.line}/>
                     </td>
                     <td>
                         <button class="book-line-button" on:click={() => handleNarrateLine(line, i)}>Narrate Line</button>
@@ -137,9 +175,9 @@
     </div>
     <div class="generation-settings">
         <div class="book-options">
-            <button class="book-options-button">Narrate All</button>
+            <button class="book-options-button" on:click={() => {handleNarrateBook()}}>Narrate All</button>
             <button class="book-options-button">Play All</button>
-            <button class="book-options-button">Pause</button>
+            <button class="book-options-button" on:click={() => {handlePauseNarration()}}>Pause</button>
             <button class="book-options-button restore" on:click={() => {handleUndoChanges()}}>Undo Changes</button>
             <button class="book-options-button save" on:click={() => {handleSaveChanges()}}>Save Changes</button>
         </div>

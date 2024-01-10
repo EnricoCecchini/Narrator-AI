@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -6,6 +6,7 @@ from rich import print
 
 from load_files import load_speakers, load_books, load_audiobooks, load_rvc_models, load_selected_book, load_index_files
 from save_files import save_book, save_speaker, save_rvc, save_index, update_book
+from play_audio import play_audio
 
 load_dotenv()
 
@@ -26,6 +27,8 @@ app.config["INDEX_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'index')
 # load available books, speakers, and RVC models
 @app.route("/load_existing_items", methods=["GET"])
 def load_existing_items():
+    session['isPlaying'] = False
+
     speakers = load_speakers(app.config["SPEAKERS_PATH"])
     books = load_books(app.config["BOOKS_PATH"])
     audiobooks = load_audiobooks(app.config["AUDIOBOOKS_PATH"])
@@ -120,12 +123,37 @@ def narrate_entire_audiobook():
     if request.method == "POST":
         data = request.get_json()
 
-        print("NARRATE BOOK: ", data)
+        session["isPlaying"] = True
+
+        print("NARRATE BOOK: ")
 
         speaker = data["speaker"]
         book = data["book"]
         rvc_model = data["rvc_model"]
-        output_file = data["output_file"]
+        index = data["index"]
+
+    return jsonify({
+        'message': 'Book narrated succesfully',
+        'success': True,
+        'error': '',
+        'data': []
+    })
+
+
+# Pause entire audiobook narration
+@app.route("/pause_narration", methods=["POST", "GET"])
+def pause_narration():
+    if request.method == "POST":
+        session["isPlaying"] = False
+
+        print("Playing Pauses", session["isPlaying"])
+
+    return jsonify({
+        'message': 'Narration paused succesfully',
+        'success': True,
+        'error': '',
+        'data': []
+    })
 
 
 @app.route('/save_book_changes', methods=['POST'])
@@ -150,7 +178,13 @@ def save_book_changes():
             'data': []
         })
 
-    update_book(app.config["BOOKS_PATH"], data)
+    remaining_lines_index = []
+
+    for line in data["lines"]:
+        remaining_lines_index.append(line['path'].split('\\')[-1].replace('.txt', ''))
+
+    print('REMAINING LINES INDEX: ', remaining_lines_index)
+    #update_book(app.config["BOOKS_PATH"], data)
 
     print('BOOK SAVED')
 

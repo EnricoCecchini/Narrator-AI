@@ -72,7 +72,10 @@ def load_selected_book(BOOKS_PATH, book):
             with open(file_path, 'r', encoding='utf-8') as f:
                 line = f.readline()
                 line = line.replace('\n', '')
-                book_lines.append(line)
+                book_lines.append({
+                    'path': file_path,
+                    'line': line
+                })
 
     except FileNotFoundError:
         print('File not found: ', file_path)
