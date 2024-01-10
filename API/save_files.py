@@ -33,6 +33,20 @@ def save_book(BOOKS_PATH, book):
     }
 
 
+# Delete audios generated for deleted lines
+def remove_audios_not_in_list(AUDIOBOOKS_PATH, book, remaining_lines_index):
+    # Delete audios by index
+    for file in os.listdir(os.path.join(AUDIOBOOKS_PATH, book)):
+
+        # If file is not in remaining lines index, delete
+        try:
+            if file.replace(".wav", "") not in remaining_lines_index:
+                os.remove(os.path.join(AUDIOBOOKS_PATH, book, file))
+        except FileNotFoundError:
+            print("Audio does not exist")
+
+
+# Update book and parse into individual files for each sentence
 def update_book(BOOKS_PATH, data):
     update_book_path = os.path.join(BOOKS_PATH, data["book"])
 
