@@ -12,6 +12,8 @@ from rich import print
 from save_files import (remove_deleted_audios, reorder_audios, save_book,
                         save_index, save_rvc, save_speaker, update_book)
 
+from classes import Narrator
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -144,6 +146,29 @@ def narrate_entire_audiobook():
             "index": index
         }
 
+        if narration_data["speaker"] == "":
+            return jsonify({
+                'message': 'No Speaker',
+                'success': False,
+                'error': '',
+                'data': []
+            })
+
+        elif narration_data["book"] == "":
+            return jsonify({
+                'message': 'No Book',
+                'success': False,
+                'error': '',
+                'data': []
+            })
+
+        narrator = Narrator(
+            speaker=narration_data["speaker"],
+            speakers_path=app.config["SPEAKERS_PATH"],
+            rvc=narration_data["rvc_model"],
+            index=narration_data["index"]
+        )
+
         # Load lines from book
         lines = load_selected_book(app.config["BOOKS_PATH"], book)
 
@@ -157,7 +182,7 @@ def narrate_entire_audiobook():
         }
 
         # Start narration thread
-        narration_thread = threading.Thread(target=narrate_all, args=[lines, app, narration_data])
+        narration_thread = threading.Thread(target=narrate_all, args=[lines, app, narration_data, narrator])
         narration_thread.start()
 
     return jsonify({

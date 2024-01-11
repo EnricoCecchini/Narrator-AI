@@ -2,7 +2,7 @@ import os
 
 
 # Narrate all lines in book
-def narrate_all(lines, app, narration_data):
+def narrate_all(lines, app, narration_data, narrator):
     print("Narrating all lines: ", lines)
     print("SPEAKER: ", narration_data["speaker"])
     print("BOOK: ", narration_data["book"])
@@ -24,21 +24,29 @@ def narrate_all(lines, app, narration_data):
             break
 
         # Narrate line
-        narrate_line(line, narration_data, audio_path)
+        narrate_line(line, narration_data, audio_path, narrator)
 
 
 # Narrate single line
-def narrate_line(line, narration_data, audio_path):
+def narrate_line(line, narration_data, audio_path, narrator):
     print("Narrating line: ", line)
 
     line_index = line['path'].split('\\')[-1].replace('.txt', '')
 
-    # save audio file
-    audio_file = os.path.join(audio_path, f"{line_index}.txt")
-    print("AUDIO FILE: ", audio_file)
+    narrator.narrate(
+        text=line['line'],
+        language='en',
+        audiobooks_path=audio_path,
+        book=narration_data["book"],
+        line_index=line_index
+    )
 
-    # Write line to audio file
-    with open(audio_file, 'w', encoding='utf-8') as f:
-        f.write(line['line'])
+    # # save audio file
+    # audio_file = os.path.join(audio_path, f"{line_index}.txt")
+    # print("AUDIO FILE: ", audio_file)
+
+    # # Write line to audio file
+    # with open(audio_file, 'w', encoding='utf-8') as f:
+    #     f.write(line['line'])
 
 

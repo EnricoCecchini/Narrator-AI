@@ -44,9 +44,9 @@ def remove_deleted_audios(AUDIOBOOKS_PATH, book, remaining_lines_index):
     # Delete audios by index
     for file in os.listdir(os.path.join(AUDIOBOOKS_PATH, book)):
         try:
-            #if file.replace(".wav", "") not in old_indexes:
-            if int(file.replace(".txt", "")) not in old_indexes:
-                print("DELETING: ", file.replace(".txt", ""))
+            if file.replace(".wav", "") not in old_indexes:
+            #if int(file.replace(".txt", "")) not in old_indexes:
+                print("DELETING: ", file.replace(".wav", ""))
                 os.remove(os.path.join(AUDIOBOOKS_PATH, book, file))
         except FileNotFoundError:
             print("Audio does not exist")
@@ -66,9 +66,9 @@ def reorder_audios(AUDIOBOOKS_PATH, book, remaining_lines_index):
     for file in os.listdir(os.path.join(AUDIOBOOKS_PATH, book)):
         try:
             for l in remaining_lines_index:
-                if l["old_index"] == file.replace(".txt", ""):
-                    print("RENAMING: ", os.path.join(AUDIOBOOKS_PATH, book, file), " TO: ", os.path.join(AUDIOBOOKS_PATH, book, f"{l['new_index']}-NEW.txt"))
-                    os.rename(os.path.join(AUDIOBOOKS_PATH, book, file), os.path.join(AUDIOBOOKS_PATH, book, f"{l['new_index']}-NEW.txt"))
+                if l["old_index"] == file.replace(".wav", ""):
+                    print("RENAMING: ", os.path.join(AUDIOBOOKS_PATH, book, file), " TO: ", os.path.join(AUDIOBOOKS_PATH, book, f"{l['new_index']}-NEW.wav"))
+                    os.rename(os.path.join(AUDIOBOOKS_PATH, book, file), os.path.join(AUDIOBOOKS_PATH, book, f"{l['new_index']}-NEW.wav"))
             #os.rename(os.path.join(AUDIOBOOKS_PATH, book, file), os.path.join(AUDIOBOOKS_PATH, book, f"{remaining_lines_index[int(file.replace('.wav', ''))]} -NEW.wav"))
             #os.rename(os.path.join(AUDIOBOOKS_PATH, book, file), os.path.join(AUDIOBOOKS_PATH, book, f"{remaining_lines_index[int(file.replace('.txt', ''))]} -NEW.wav"))
         except FileNotFoundError:
