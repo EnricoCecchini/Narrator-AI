@@ -1,6 +1,6 @@
 from flask import session
 
-def play_audio():
+def play_audio(lines, app):
 
-    while 'isPlaying' in session and session["isPlaying"]:
+    while app.config["isNarrating"]:
         print("Playing audio")

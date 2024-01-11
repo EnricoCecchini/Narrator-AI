@@ -1,12 +1,16 @@
-from flask import Flask, request, jsonify, session
-from flask_cors import CORS
-from dotenv import load_dotenv
 import os
-from rich import print
 
-from load_files import load_speakers, load_books, load_audiobooks, load_rvc_models, load_selected_book, load_index_files
-from save_files import save_book, save_speaker, save_rvc, save_index, update_book
+from dotenv import load_dotenv
+from flask import Flask, jsonify, request, session
+from flask_cors import CORS
+from load_files import (load_audiobooks, load_books, load_index_files,
+                        load_rvc_models, load_selected_book, load_speakers)
+import threading
 from play_audio import play_audio
+from rich import print
+from save_files import (save_book, save_index, save_rvc, save_speaker,
+                        update_book)
+from narrator import narrate_all, narrate_line
 
 load_dotenv()
 
@@ -21,6 +25,8 @@ app.config["AUDIOBOOKS_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'audioboo
 app.config["RVC_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'rvc_models')
 app.config["INDEX_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'index')
 
+app.config["isNarrating"] = False
+
 
 # Load existing data
 
@@ -28,6 +34,7 @@ app.config["INDEX_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'index')
 @app.route("/load_existing_items", methods=["GET"])
 def load_existing_items():
     session['isPlaying'] = False
+    session["isNarrating"] = False
 
     speakers = load_speakers(app.config["SPEAKERS_PATH"])
     books = load_books(app.config["BOOKS_PATH"])
@@ -123,14 +130,28 @@ def narrate_entire_audiobook():
     if request.method == "POST":
         data = request.get_json()
 
-        session["isPlaying"] = True
-
         print("NARRATE BOOK: ")
 
         speaker = data["speaker"]
         book = data["book"]
         rvc_model = data["rvc_model"]
         index = data["index"]
+
+        # Load lines from book
+        lines = load_selected_book(app.config["BOOKS_PATH"], book)
+
+        app.config["isNarrating"] = True
+
+        session["narration_data"] = {
+            "speaker": speaker,
+            "book": book,
+            "rvc_model": rvc_model,
+            "index": index
+        }
+
+        # Start narration thread
+        narration_thread = threading.Thread(target=narrate_all, args=[lines, speaker, app])
+        narration_thread.start()
 
     return jsonify({
         'message': 'Book narrated succesfully',
@@ -144,9 +165,11 @@ def narrate_entire_audiobook():
 @app.route("/pause_narration", methods=["POST", "GET"])
 def pause_narration():
     if request.method == "POST":
-        session["isPlaying"] = False
+        session["isNarrating"] = False
 
-        print("Playing Pauses", session["isPlaying"])
+        app.config["isNarrating"] = False
+
+        print("Playing Pauses", app.config["isNarrating"])
 
     return jsonify({
         'message': 'Narration paused succesfully',
