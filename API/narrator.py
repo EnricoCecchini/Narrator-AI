@@ -24,22 +24,35 @@ def narrate_all(lines, app, narration_data, narrator):
             break
 
         # Narrate line
-        narrate_line(line, narration_data, audio_path, narrator)
+        narrate_line(line, narration_data, app.config["AUDIOBOOKS_PATH"], narrator)
 
 
 # Narrate single line
-def narrate_line(line, narration_data, audio_path, narrator):
-    print("Narrating line: ", line)
+def narrate_line(line, narration_data, AUDIOBOOKS_PATH, narrator):
+    audio_path = os.path.join(AUDIOBOOKS_PATH, narration_data["book"])
 
+    print("Narrating line: ", line)
     line_index = line['path'].split('\\')[-1].replace('.txt', '')
 
-    narrator.narrate(
-        text=line['line'],
-        language='en',
-        audiobooks_path=audio_path,
-        book=narration_data["book"],
-        line_index=line_index
-    )
+    try:
+        narrator.narrate(
+            text=line['line'],
+            language='en',
+            audiobooks_path=audio_path,
+            book=narration_data["book"],
+            line_index=line_index
+        )
+    except Exception as e:
+        print("ERROR: ", e)
+        return {
+            "message": "Error narrating line",
+            "success": False
+        }
+
+    return {
+        "message": "Line narrated succesfully",
+        "success": True
+    }
 
     # # save audio file
     # audio_file = os.path.join(audio_path, f"{line_index}.txt")

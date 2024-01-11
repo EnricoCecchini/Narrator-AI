@@ -111,17 +111,47 @@ def load_selected():
 
 # Narrate specific line
 @app.route("/narrate_line", methods=["POST", "GET"])
-def narrate_line():
+def narrate_line_route():
     if request.method == "POST":
         data = request.get_json()
 
         print("NARRATE LINE: ", data)
 
-        speaker = data["speaker"]
-        book = data["book"]
-        line = data["line"]
-        rvc_model = data["rvc_model"]
-        index = data["index"]
+        narration_data = {
+            "speaker": data["speaker"],
+            "book": data["book"],
+            "rvc_model": data["rvc_model"],
+            "index": data["index"],
+            "line": data["line"]
+        }
+
+        print("line: ", narration_data["line"])
+
+        if narration_data["speaker"] == "":
+            return jsonify({
+                'message': 'No Speaker',
+                'success': False,
+                'error': '',
+                'data': []
+            })
+
+        elif narration_data["book"] == "":
+            return jsonify({
+                'message': 'No Book',
+                'success': False,
+                'error': '',
+                'data': []
+            })
+
+        narrator = Narrator(
+            speaker=narration_data["speaker"],
+            speakers_path=app.config["SPEAKERS_PATH"],
+            rvc=narration_data["rvc_model"],
+            index=narration_data["index"]
+        )
+
+        # Narrate line
+        narrate_line(narration_data["line"], narration_data, app.config["AUDIOBOOKS_PATH"], narrator)
 
     return jsonify({'message': 'Line narrated succesfully', 'success': True, 'error': '', 'data': []})
 
@@ -134,16 +164,11 @@ def narrate_entire_audiobook():
 
         print("NARRATE BOOK: ")
 
-        speaker = data["speaker"]
-        book = data["book"]
-        rvc_model = data["rvc_model"]
-        index = data["index"]
-
         narration_data = {
-            "speaker": speaker,
-            "book": book,
-            "rvc_model": rvc_model,
-            "index": index
+            "speaker": data["speaker"],
+            "book": data["book"],
+            "rvc_model": data["rvc_model"],
+            "index": data["index"]
         }
 
         if narration_data["speaker"] == "":
@@ -170,15 +195,15 @@ def narrate_entire_audiobook():
         )
 
         # Load lines from book
-        lines = load_selected_book(app.config["BOOKS_PATH"], book)
+        lines = load_selected_book(app.config["BOOKS_PATH"], narration_data["book"])
 
         app.config["isNarrating"] = True
 
         session["narration_data"] = {
-            "speaker": speaker,
-            "book": book,
-            "rvc_model": rvc_model,
-            "index": index
+            "speaker": narration_data["speaker"],
+            "book": narration_data["book"],
+            "rvc_model": narration_data["rvc_model"],
+            "index": narration_data["index"]
         }
 
         # Start narration thread

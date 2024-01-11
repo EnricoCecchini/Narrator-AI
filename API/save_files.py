@@ -44,8 +44,7 @@ def remove_deleted_audios(AUDIOBOOKS_PATH, book, remaining_lines_index):
     # Delete audios by index
     for file in os.listdir(os.path.join(AUDIOBOOKS_PATH, book)):
         try:
-            if file.replace(".wav", "") not in old_indexes:
-            #if int(file.replace(".txt", "")) not in old_indexes:
+            if int(file.replace(".wav", "")) not in old_indexes:
                 print("DELETING: ", file.replace(".wav", ""))
                 os.remove(os.path.join(AUDIOBOOKS_PATH, book, file))
         except FileNotFoundError:
@@ -61,7 +60,9 @@ def remove_deleted_audios(AUDIOBOOKS_PATH, book, remaining_lines_index):
 def reorder_audios(AUDIOBOOKS_PATH, book, remaining_lines_index):
 
     print("REORDERING AUDIOS: ", remaining_lines_index)
+    print('AUDIO PATH: ', os.path.join(AUDIOBOOKS_PATH, book))
     print('FILES: ', os.listdir(os.path.join(AUDIOBOOKS_PATH, book)))
+
     # Rename audios to new index
     for file in os.listdir(os.path.join(AUDIOBOOKS_PATH, book)):
         try:
@@ -104,11 +105,6 @@ def update_book(BOOKS_PATH, data, remaining_lines_index):
     # Delete from Processed dir
     for file in os.listdir(os.path.join(update_book_path, "Processed")):
         os.remove(os.path.join(update_book_path, "Processed", file))
-
-    # Delete audios by index
-    for line in data["lines"]:
-        #os.remove(os.path.join(update_book_path, "Audio", f"{line}.wav"))
-        pass
 
     # Delete book
     os.remove(os.path.join(update_book_path, f'{data["book"]}.txt'))

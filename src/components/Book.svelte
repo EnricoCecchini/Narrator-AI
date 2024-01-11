@@ -23,6 +23,8 @@
 
     // Narrate selected line
     const handleNarrateLine = async (line, index) => {
+        await handleSaveChanges()
+
         const data = {
             line: line,
             index: index,
