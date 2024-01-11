@@ -5,7 +5,8 @@
                 selected_book,
                 selected_speaker,
                 selected_rvc,
-                selected_index
+                selected_index,
+                AUDIO_PATH
     } from '../../static/store'
 
     import { narrate_line } from '../requests/narrate_line'
@@ -15,11 +16,14 @@
     import { pause_narration } from '../requests/pause_narration'
 
     let book_lines = []
+    let audioList = []
+
 
     const unsubscribeSelectedLines = selected_book_lines.subscribe(value => {
         book_lines = value
         console.log('BOOK LINES: ', book_lines)
     })
+
 
     // Narrate selected line
     const handleNarrateLine = async (line, index) => {
@@ -42,27 +46,40 @@
         const audio = await narrate_line(data)
     }
 
+
     // Delete selected line
     const handleDeleteLine = async (index) => {
         book_lines.splice(index, 1)
         selected_book_lines.set(book_lines)
     }
 
+
     // Play selected line
     const handlePlayLine = async (index) => {
-        const data = {
-            index: index,
-            book: $selected_book,
-        }
+        console.log('AUDIO SOURCE: ', `${AUDIO_PATH}\\${$selected_book}\\${index}.wav`)
+        const audio = audioList[index]
 
-        console.log('PLAY: ', data)
+        // If audio exists, play it
+        if (audio) {
+            // If not playing, play audio
+            if (audio.paused) {
+                audio.play()
+            } else {
+                // If playing, pause audio
+                audio.pause()
+            }
+        } else {
+            alert('Please narrate line before playing')
+        }
     }
+
 
     // Add line below selected line
     const handleAddLineBelow = async (index) => {
         book_lines.splice(index + 1, 0, {'line': '', 'path': ''})
         selected_book_lines.set(book_lines)
     }
+
 
     // Move selected line up
     const handleMoveLineUp = async (index) => {
@@ -74,6 +91,7 @@
         selected_book_lines.set(book_lines)
     }
 
+
     // Move selected line down
     const handleMoveLineDown = async (index) => {
         let tempLine = book_lines[index]
@@ -83,6 +101,7 @@
 
         selected_book_lines.set(book_lines)
     }
+
 
     // Begin Book Narration
     const handleNarrateBook = async () => {
@@ -111,12 +130,14 @@
         await handleReloadBook()
     }
 
+
     // Pause Book Narration
     const handlePauseNarration = async () => {
         console.log('PAUSE NARRATION')
 
         const response = await pause_narration()
     }
+
 
     // Save changes to book
     const handleSaveChanges = async () => {
@@ -132,13 +153,17 @@
         return response
     }
 
+
     // Undo unsaved changes by reloading lines from selected book
     const handleReloadBook = async () => {
         const response = await load_book($selected_book)
 
         // Save lines from selected book in store
         selected_book_lines.set(response.data)
+
+        audioList = new Array(book_lines.length)
     }
+
 
     onDestroy(() => {
         unsubscribeSelectedLines()
@@ -156,6 +181,8 @@
                 <td class="book-table-header-move">Move</td>
             </tr>
             {#each book_lines as line, i}
+                <audio bind:this={audioList[i]} src={`${AUDIO_PATH}\\${$selected_book}\\${i}.wav`}></audio>
+
                 <tr class="book-table-row">
                     <td class="book-table-line-number">{i}</td>
                     <td>
