@@ -1,16 +1,16 @@
 import os
+import threading
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, session
 from flask_cors import CORS
 from load_files import (load_audiobooks, load_books, load_index_files,
                         load_rvc_models, load_selected_book, load_speakers)
-import threading
+from narrator import narrate_all, narrate_line
 from play_audio import play_audio
 from rich import print
-from save_files import (save_book, save_index, save_rvc, save_speaker,
-                        update_book)
-from narrator import narrate_all, narrate_line
+from save_files import (remove_deleted_audios, reorder_audios, save_book,
+                        save_index, save_rvc, save_speaker, update_book)
 
 load_dotenv()
 
@@ -137,6 +137,13 @@ def narrate_entire_audiobook():
         rvc_model = data["rvc_model"]
         index = data["index"]
 
+        narration_data = {
+            "speaker": speaker,
+            "book": book,
+            "rvc_model": rvc_model,
+            "index": index
+        }
+
         # Load lines from book
         lines = load_selected_book(app.config["BOOKS_PATH"], book)
 
@@ -150,7 +157,7 @@ def narrate_entire_audiobook():
         }
 
         # Start narration thread
-        narration_thread = threading.Thread(target=narrate_all, args=[lines, speaker, app])
+        narration_thread = threading.Thread(target=narrate_all, args=[lines, app, narration_data])
         narration_thread.start()
 
     return jsonify({
@@ -203,11 +210,27 @@ def save_book_changes():
 
     remaining_lines_index = []
 
-    for line in data["lines"]:
-        remaining_lines_index.append(line['path'].split('\\')[-1].replace('.txt', ''))
+    for i, line in enumerate(data["lines"]):
+
+        new_line = {
+            'line': line['line'],
+            'new_index': i,
+            'old_index': line['path'].split('\\')[-1].replace('.txt', '')
+        }
+        print(i, line)
+
+        remaining_lines_index.append(new_line)
 
     print('REMAINING LINES INDEX: ', remaining_lines_index)
-    #update_book(app.config["BOOKS_PATH"], data)
+
+    # Update book with updated lines
+    update_book(app.config["BOOKS_PATH"], data, remaining_lines_index)
+
+    # Delete audios for deleted lines
+    remove_deleted_audios(app.config["AUDIOBOOKS_PATH"], data["book"], remaining_lines_index)
+
+    # Reorder audios to match new line order
+    reorder_audios(app.config["AUDIOBOOKS_PATH"], data["book"], remaining_lines_index)
 
     print('BOOK SAVED')
 

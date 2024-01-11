@@ -1,4 +1,6 @@
 import os
+from rich import print
+
 
 # Save book and parse into individual files for each sentence
 def save_book(BOOKS_PATH, book):
@@ -34,23 +36,64 @@ def save_book(BOOKS_PATH, book):
 
 
 # Delete audios generated for deleted lines
-def remove_audios_not_in_list(AUDIOBOOKS_PATH, book, remaining_lines_index):
+def remove_deleted_audios(AUDIOBOOKS_PATH, book, remaining_lines_index):
+    old_indexes = [int(line["old_index"]) for line in remaining_lines_index if line["old_index"] != ""]
+
+    print("OLD INDEXES: ", old_indexes)
+
     # Delete audios by index
     for file in os.listdir(os.path.join(AUDIOBOOKS_PATH, book)):
-
-        # If file is not in remaining lines index, delete
         try:
-            if file.replace(".wav", "") not in remaining_lines_index:
+            #if file.replace(".wav", "") not in old_indexes:
+            if int(file.replace(".txt", "")) not in old_indexes:
+                print("DELETING: ", file.replace(".txt", ""))
                 os.remove(os.path.join(AUDIOBOOKS_PATH, book, file))
         except FileNotFoundError:
             print("Audio does not exist")
 
+    return {
+        "message": "Audios deleted succesfully",
+        "success": True
+    }
+
+
+# Reorder audios to match new line order
+def reorder_audios(AUDIOBOOKS_PATH, book, remaining_lines_index):
+
+    print("REORDERING AUDIOS: ", remaining_lines_index)
+    print('FILES: ', os.listdir(os.path.join(AUDIOBOOKS_PATH, book)))
+    # Rename audios to new index
+    for file in os.listdir(os.path.join(AUDIOBOOKS_PATH, book)):
+        try:
+            for l in remaining_lines_index:
+                if l["old_index"] == file.replace(".txt", ""):
+                    print("RENAMING: ", os.path.join(AUDIOBOOKS_PATH, book, file), " TO: ", os.path.join(AUDIOBOOKS_PATH, book, f"{l['new_index']}-NEW.txt"))
+                    os.rename(os.path.join(AUDIOBOOKS_PATH, book, file), os.path.join(AUDIOBOOKS_PATH, book, f"{l['new_index']}-NEW.txt"))
+            #os.rename(os.path.join(AUDIOBOOKS_PATH, book, file), os.path.join(AUDIOBOOKS_PATH, book, f"{remaining_lines_index[int(file.replace('.wav', ''))]} -NEW.wav"))
+            #os.rename(os.path.join(AUDIOBOOKS_PATH, book, file), os.path.join(AUDIOBOOKS_PATH, book, f"{remaining_lines_index[int(file.replace('.txt', ''))]} -NEW.wav"))
+        except FileNotFoundError:
+            pass
+
+    # Rename audios to remove -NEW
+    print('REMOVE -NEW FROM FILE NAME')
+    for file in os.listdir(os.path.join(AUDIOBOOKS_PATH, book)):
+        try:
+            print('REMOVE -NEW: ', os.path.join(AUDIOBOOKS_PATH, book, file), ' TO: ', os.path.join(AUDIOBOOKS_PATH, book, file.replace('-NEW', '')))
+            os.rename(os.path.join(AUDIOBOOKS_PATH, book, file), os.path.join(AUDIOBOOKS_PATH, book, file.replace('-NEW', '')))
+        except FileNotFoundError:
+            pass
+
+    return {
+        "message": "Audios reordered succesfully",
+        "success": True
+    }
+
 
 # Update book and parse into individual files for each sentence
-def update_book(BOOKS_PATH, data):
+def update_book(BOOKS_PATH, data, remaining_lines_index):
     update_book_path = os.path.join(BOOKS_PATH, data["book"])
 
-    print("UPDATE BOOK PATH: ", update_book_path)
+    print("NEW LINE ORDER: ", remaining_lines_index)
 
     if not os.path.exists(update_book_path):
         return {
@@ -72,11 +115,11 @@ def update_book(BOOKS_PATH, data):
 
     for i, line in enumerate(data["lines"]):
         with open(os.path.join(update_book_path, "Processed", f"{i}.txt"), 'w', encoding='utf-8') as f:
-            f.write(line)
+            f.write(line["line"])
 
         # Append to book
         with open(os.path.join(update_book_path, f'{data["book"]}.txt'), 'a', encoding='utf-8') as f:
-            f.write(f'{line}\n')
+            f.write(f'{line["line"]}\n')
 
     return {
         "message": "Book updated succesfully",

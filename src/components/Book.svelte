@@ -105,6 +105,8 @@
         console.log('BEGIN NARRATION: ', data)
 
         const response = await narrate_book(data)
+
+        await handleReloadBook()
     }
 
     // Pause Book Narration
@@ -123,11 +125,13 @@
 
         const response = await save_book_changes(data)
 
+        await handleReloadBook()
+
         return response
     }
 
     // Undo unsaved changes by reloading lines from selected book
-    const handleUndoChanges = async () => {
+    const handleReloadBook = async () => {
         const response = await load_book($selected_book)
 
         // Save lines from selected book in store
@@ -178,7 +182,7 @@
             <button class="book-options-button" on:click={() => {handleNarrateBook()}}>Narrate All</button>
             <button class="book-options-button">Play All</button>
             <button class="book-options-button" on:click={() => {handlePauseNarration()}}>Pause</button>
-            <button class="book-options-button restore" on:click={() => {handleUndoChanges()}}>Undo Changes</button>
+            <button class="book-options-button restore" on:click={() => {handleReloadBook()}}>Undo Changes</button>
             <button class="book-options-button save" on:click={() => {handleSaveChanges()}}>Save Changes</button>
         </div>
         <div class="voice-settings-container">
