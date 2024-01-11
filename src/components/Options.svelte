@@ -1,8 +1,5 @@
 <script>
     import { onMount } from 'svelte';
-    import {writable} from 'svelte/store';
-
-    import { API_ROUTE } from "../requests/api";
 
     import {load_existing_files} from '../requests/load_existing_data'
     import {upload_file} from '../requests/upload_files'

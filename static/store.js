@@ -13,3 +13,4 @@ export const selected_index = writable('')
 
 export const selected_book_lines = writable([])
 export const AUDIO_PATH = '../static/audiobooks'
+export const audio_list = writable([])

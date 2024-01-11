@@ -35,6 +35,11 @@ def narrate_all(lines, app, narration_data, narrator):
 # Narrate single line
 def narrate_line(line, narration_data, AUDIOBOOKS_PATH, narrator):
     audio_path = os.path.join(AUDIOBOOKS_PATH, narration_data["book"])
+    print("Audio path: ", audio_path)
+
+    # Check if audiobook exists
+    if not os.path.exists(audio_path):
+        os.mkdir(audio_path)
 
     print("Narrating line: ", line)
     line_index = line['path'].split('\\')[-1].replace('.txt', '')

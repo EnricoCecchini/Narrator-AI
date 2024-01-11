@@ -13,6 +13,7 @@ export const narrate_book = async (book_data) => {
     .then(response => response.json())
     .then(data => {
         console.log(data)
+        alert(data.message)
         return data
     })
     .catch(e => {

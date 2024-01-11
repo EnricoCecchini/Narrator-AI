@@ -1,5 +1,5 @@
 <script>
-    import { onDestroy } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
 
     import {    selected_book_lines,
                 selected_book,
@@ -14,6 +14,7 @@
     import { save_book_changes } from '../requests/save_book_changes'
     import { narrate_book } from '../requests/narrate_book'
     import { pause_narration } from '../requests/pause_narration'
+
 
     let book_lines = []
     let audioList = []
@@ -43,7 +44,9 @@
         }
 
         console.log(data)
-        const audio = await narrate_line(data)
+        await narrate_line(data)
+
+        await handleReloadBook()
     }
 
 
@@ -59,17 +62,33 @@
         console.log('AUDIO SOURCE: ', `${AUDIO_PATH}\\${$selected_book}\\${index}.wav`)
         const audio = audioList[index]
 
+        console.log('AUDIO: ', audio)
+        console.log('AUDIO LIST PLAY: ', audioList)
+
         // If audio exists, play it
-        if (audio) {
+        // if (audio) {
+        //     // If not playing, play audio
+        //     if (audio.paused) {
+        //         await audio.play()
+        //     } else {
+        //         // If playing, pause audio
+        //         audio.pause()
+        //     }
+        // } else {
+        //     alert('Please narrate line before playing')
+        // }
+
+        try {
             // If not playing, play audio
             if (audio.paused) {
-                audio.play()
+                await audio.play()
             } else {
                 // If playing, pause audio
                 audio.pause()
             }
-        } else {
-            alert('Please narrate line before playing')
+        } catch (e) {
+            console.log('ERROR PLAYING LINE: ', e)
+            alert('ERROR PLAYING LINE: ' + e)
         }
     }
 
@@ -89,6 +108,9 @@
         book_lines[index - 1] = tempLine
 
         selected_book_lines.set(book_lines)
+        console.log('BOOK LINES: ', book_lines)
+        //audioList = new Array(book_lines.length)
+        console.log('AUDIO LIST: ', audioList)
     }
 
 
@@ -100,6 +122,8 @@
         book_lines[index + 1] = tempLine
 
         selected_book_lines.set(book_lines)
+        //audioList = new Array(book_lines.length)
+        console.log('AUDIO LIST: ', audioList)
     }
 
 
@@ -154,6 +178,24 @@
     }
 
 
+    const handleReloadAudios = async () => {
+        const newAudioList = []
+
+        for (let i = 0; i < book_lines.length; i++) {
+            let audio_path = `${AUDIO_PATH}\\${$selected_book}\\${i}.wav`
+            console.log('AUDIO PATH: ', audio_path)
+            newAudioList.push(new Audio(audio_path))
+
+            console.log('AUDIO LIST: ', audioList)
+        }
+
+        // Empty audio list
+        audioList = []
+
+        audioList = newAudioList
+    }
+
+
     // Undo unsaved changes by reloading lines from selected book
     const handleReloadBook = async () => {
         const response = await load_book($selected_book)
@@ -161,9 +203,19 @@
         // Save lines from selected book in store
         selected_book_lines.set(response.data)
 
-        audioList = new Array(book_lines.length)
+        //audioList = new Array(book_lines.length)
+        console.log('AUDIO LIST RELOAD: ', audioList)
+
+        audioList = []
+
+        await handleReloadAudios()
     }
 
+
+    onMount(async () => {
+        await handleReloadBook()
+        await handleReloadAudios()
+    })
 
     onDestroy(() => {
         unsubscribeSelectedLines()
