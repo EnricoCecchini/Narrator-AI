@@ -19,6 +19,7 @@ def narrate_all(lines, app, narration_data, narrator):
         # Check if narration is paused
         if not app.config["isNarrating"]:
             message = "Narration paused"
+            print(message)
             break
 
         # Narrate line

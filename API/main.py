@@ -168,6 +168,18 @@ def narrate_line_route():
 @app.route("/narrate_entire_audiobook", methods=["POST", "GET"])
 def narrate_entire_audiobook():
     if request.method == "POST":
+        if app.config["isNarrating"]:
+            print("Already narrating")
+
+            return jsonify({
+                'message': 'Already narrating',
+                'success': False,
+                'error': '',
+                'data': []
+            })
+
+        app.config["isNarrating"] = True
+
         data = request.get_json()
 
         print("NARRATE BOOK: ")
@@ -204,8 +216,6 @@ def narrate_entire_audiobook():
 
         # Load lines from book
         lines = load_selected_book(app.config["BOOKS_PATH"], narration_data["book"])
-
-        app.config["isNarrating"] = True
 
         session["narration_data"] = {
             "speaker": narration_data["speaker"],
