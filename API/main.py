@@ -244,7 +244,7 @@ def pause_narration():
 
         app.config["isNarrating"] = False
 
-        print("Playing Pauses", app.config["isNarrating"])
+        print("Narration Pauses", app.config["isNarrating"])
 
     return jsonify({
         'message': 'Narration paused succesfully',
@@ -308,6 +308,44 @@ def save_book_changes():
         'error': '',
         'data': []
     })
+
+
+@app.route('/check_audio_exists', methods=['GET', 'POST'])
+def check_audio_exists(audio_path="Hello"):
+    audio_path = request.json['audio_path']
+
+    print('\n\nCHECKING AUDIO!!!\n')
+    print('CHECK AUDIO EXISTS: ', audio_path)
+
+    if not audio_path:
+        return jsonify({
+            'message': 'No audio path',
+            'success': False,
+            'error': '',
+            'data': []
+        })
+
+    audio_path = audio_path.replace('%20', ' ')
+
+    print('CHECK AUDIO EXISTS: ', audio_path)
+
+    if os.path.exists(audio_path):
+        return jsonify({
+            'message': 'Audio exists',
+            'success': True,
+            'error': '',
+            'data': []
+        })
+
+    else:
+        return jsonify({
+            'message': 'Audio does not exist',
+            'success': False,
+            'error': '',
+            'data': []
+        })
+
+
 
 # Run app
 if __name__ == "__main__":

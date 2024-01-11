@@ -14,6 +14,7 @@
     import { save_book_changes } from '../requests/save_book_changes'
     import { narrate_book } from '../requests/narrate_book'
     import { pause_narration } from '../requests/pause_narration'
+    import { check_audio_exists } from '../requests/check_audio_exists'
 
 
     let book_lines = []
@@ -24,30 +25,6 @@
         book_lines = value
         console.log('BOOK LINES: ', book_lines)
     })
-
-
-    // Narrate selected line
-    const handleNarrateLine = async (line, index) => {
-        await handleSaveChanges()
-
-        const data = {
-            line: line,
-            index: index,
-            book: $selected_book,
-            speaker: $selected_speaker,
-            rvc_model: $selected_rvc
-        }
-
-        if (data.speaker === '') {
-            alert('Please select a speaker')
-            return
-        }
-
-        console.log(data)
-        await narrate_line(data)
-
-        await handleReloadBook()
-    }
 
 
     // Delete selected line
@@ -65,23 +42,14 @@
         console.log('AUDIO: ', audio)
         console.log('AUDIO LIST PLAY: ', audioList)
 
-        // If audio exists, play it
-        // if (audio) {
-        //     // If not playing, play audio
-        //     if (audio.paused) {
-        //         await audio.play()
-        //     } else {
-        //         // If playing, pause audio
-        //         audio.pause()
-        //     }
-        // } else {
-        //     alert('Please narrate line before playing')
-        // }
-
         try {
             // If not playing, play audio
             if (audio.paused) {
-                await audio.play()
+                // Reset audio to beginning
+                audio.currentTime = 0
+
+                // audio.load()
+                audio.play()
             } else {
                 // If playing, pause audio
                 audio.pause()
@@ -155,6 +123,30 @@
     }
 
 
+    // Narrate selected line
+    const handleNarrateLine = async (line, index) => {
+        await handleSaveChanges()
+
+        const data = {
+            line: line,
+            index: index,
+            book: $selected_book,
+            speaker: $selected_speaker,
+            rvc_model: $selected_rvc
+        }
+
+        if (data.speaker === '') {
+            alert('Please select a speaker')
+            return
+        }
+
+        console.log(data)
+        await narrate_line(data)
+
+        await handleReloadBook()
+    }
+
+
     // Pause Book Narration
     const handlePauseNarration = async () => {
         console.log('PAUSE NARRATION')
@@ -174,6 +166,8 @@
 
         await handleReloadBook()
 
+        await handleReloadAudios()
+
         return response
     }
 
@@ -184,13 +178,33 @@
         for (let i = 0; i < book_lines.length; i++) {
             let audio_path = `${AUDIO_PATH}\\${$selected_book}\\${i}.wav`
             console.log('AUDIO PATH: ', audio_path)
-            newAudioList.push(new Audio(audio_path))
+
+            // Check if audio file exists
+            const audio_exists = await check_audio_exists(audio_path)
+
+            console.log('AUDIO EXISTS: ', audio_exists)
+
+            if (audio_exists) {
+                console.log('AUDIO EXISTS: ', audio_path)
+
+                // Load audio file into audio list using fetch
+                fetch(audio_path)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const audio = new Audio(URL.createObjectURL(blob))
+                        newAudioList.push(audio)
+                    })
+
+            } else {
+                console.log('AUDIO DOES NOT EXIST: ', audio_path)
+                newAudioList.push(null)
+            }
 
             console.log('AUDIO LIST: ', audioList)
         }
 
         // Empty audio list
-        audioList = []
+        audioList = new Array(book_lines.length)
 
         audioList = newAudioList
     }
