@@ -3,17 +3,17 @@
 Svelte app to generate audiobooks locally using XTTS
 
 ## Todo
-- [ ] Implement TTS
-- [ ] Save audios in audiobooks\BOOK
+- [x] Implement TTS
+- [x] Save audios in audiobooks\BOOK
 - [ ] Combine audios in audiobooks\BOOK\AUDIOBOOK
 - [x] Add\Delete lines in UI (And generated audio for selected line)
 - [x] Reorder lines in UI
 - [x] Undo unsaved changes
 - [x] Save BOOK file with modified lines (Join all lines in single txt)
 - [x] Save modified lines (Delete lines in books\BOOK and split new book)
-- [ ] Sync delete/modify audios and lines
+- [x] Sync delete/modify audios and lines
 - [ ] Play audio in Svelte UI
-- [ ] Re-narrate selected line
+- [x] Re-narrate selected line
 
 ## Future Plans
 - [ ] Implement RVC

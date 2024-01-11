@@ -1,16 +1,12 @@
 import os
+from rich import print
 
 
 # Narrate all lines in book
 def narrate_all(lines, app, narration_data, narrator):
-    print("Narrating all lines: ", lines)
-    print("SPEAKER: ", narration_data["speaker"])
-    print("BOOK: ", narration_data["book"])
-    print("RVC MODEL: ", narration_data["rvc_model"])
-    print("INDEX: ", narration_data["index"])
-
     audio_path = os.path.join(app.config["AUDIOBOOKS_PATH"], narration_data["book"])
-    print("AUDIO PATH: ", audio_path)
+
+    message = ""
 
     # Check if audiobook exists
     if not os.path.exists(audio_path):
@@ -19,12 +15,20 @@ def narrate_all(lines, app, narration_data, narrator):
     # Iterate lines in book
     for line in lines:
 
+        print('NARRATING: ', app.config["isNarrating"])
         # Check if narration is paused
         if not app.config["isNarrating"]:
+            message = "Narration paused"
             break
 
         # Narrate line
-        narrate_line(line, narration_data, app.config["AUDIOBOOKS_PATH"], narrator)
+        if line['line'] != "":
+            narrate_line(line, narration_data, app.config["AUDIOBOOKS_PATH"], narrator)
+
+    return {
+        "message": message,
+        "success": True
+    }
 
 
 # Narrate single line
@@ -34,6 +38,12 @@ def narrate_line(line, narration_data, AUDIOBOOKS_PATH, narrator):
     print("Narrating line: ", line)
     line_index = line['path'].split('\\')[-1].replace('.txt', '')
 
+    if line['line'] == "":
+        return {
+            "message": "Empty line",
+            "success": False
+        }
+
     try:
         narrator.narrate(
             text=line['line'],
@@ -42,6 +52,7 @@ def narrate_line(line, narration_data, AUDIOBOOKS_PATH, narrator):
             book=narration_data["book"],
             line_index=line_index
         )
+
     except Exception as e:
         print("ERROR: ", e)
         return {
@@ -53,13 +64,3 @@ def narrate_line(line, narration_data, AUDIOBOOKS_PATH, narrator):
         "message": "Line narrated succesfully",
         "success": True
     }
-
-    # # save audio file
-    # audio_file = os.path.join(audio_path, f"{line_index}.txt")
-    # print("AUDIO FILE: ", audio_file)
-
-    # # Write line to audio file
-    # with open(audio_file, 'w', encoding='utf-8') as f:
-    #     f.write(line['line'])
-
-

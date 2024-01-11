@@ -143,6 +143,14 @@ def narrate_line_route():
                 'data': []
             })
 
+        elif len(narration_data["line"]['line']) == 0:
+            return jsonify({
+                'message': 'No Line',
+                'success': False,
+                'error': '',
+                'data': []
+            })
+
         narrator = Narrator(
             speaker=narration_data["speaker"],
             speakers_path=app.config["SPEAKERS_PATH"],
