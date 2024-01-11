@@ -21,4 +21,3 @@ Svelte app to generate audiobooks locally using XTTS
 
 
 ## Known Bugs
-- [ ] Pause Narration button does not pause narration
