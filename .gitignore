@@ -27,7 +27,7 @@ dist-ssr
 static/books/*
 static/audiobooks/*
 static/speakers/*
-static/rvc_models/*
+static/rvcModels/*
 static/index/*
 test
 
