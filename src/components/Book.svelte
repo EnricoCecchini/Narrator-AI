@@ -19,6 +19,9 @@
 
     let book_lines = []
     let audioList = []
+    let audio = new Audio()
+    let currentAudioIndex = 0
+    let isPaused = true
 
 
     const unsubscribeSelectedLines = selected_book_lines.subscribe(value => {
@@ -37,7 +40,7 @@
     // Play selected line
     const handlePlayLine = async (index) => {
         console.log('AUDIO SOURCE: ', `${AUDIO_PATH}\\${$selected_book}\\${index}.wav`)
-        const audio = audioList[index]
+        audio = audioList[index]
 
         console.log('AUDIO: ', audio)
         console.log('AUDIO LIST PLAY: ', audioList)
@@ -226,6 +229,64 @@
     }
 
 
+    const playNextLine = async () => {
+        console.log('PLAY NEXT LINE: ', currentAudioIndex)
+        console.log('AUDIO LIST PLAYING: ', audioList)
+
+        if (currentAudioIndex <= audioList.length && !isPaused) {
+            audio = audioList[currentAudioIndex]
+
+            console.log('CURRENT ADUIO: ', audio)
+
+            try {
+                if (audio !== null) {
+                    await audio.play()
+
+                    audio.addEventListener('ended', () => {
+                        console.log('AUDIO ENDED')
+                        currentAudioIndex += 1
+                        playNextLine()
+                    })
+
+                } else {
+                    currentAudioIndex += 1
+                    playNextLine()
+                }
+            } catch (e) {
+                console.log('ERROR PLAYING LINE: ', e)
+
+                if (e instanceof DOMException) {
+                    console.log('ERROR PLAYING LINE: ' + e)
+                } else {
+                    console.log('ERROR PLAYING LINE: ', e)
+                }
+            }
+
+            //console.log('AUDIO PLAYED: ', audio)
+            // currentAudioIndex += 1
+            // playNextLine()
+        }
+    }
+
+
+    const handlePlayAll = async () => {
+        console.log('PLAY ALL')
+
+        isPaused = false
+        currentAudioIndex = 0
+        await playNextLine()
+    }
+
+
+    // Pause playing all audio
+    const handlePausePlaying = () => {
+        audio.pause()
+        audio.currentTime = 0
+
+        isPaused = true
+    }
+
+
     onMount(async () => {
         await handleReloadBook()
         await handleReloadAudios()
@@ -275,8 +336,11 @@
     <div class="generation-settings">
         <div class="book-options">
             <button class="book-options-button" on:click={() => {handleNarrateBook()}}>Narrate All</button>
-            <button class="book-options-button">Play All</button>
-            <button class="book-options-button" on:click={() => {handlePauseNarration()}}>Pause</button>
+            <button class="book-options-button" on:click={() => {handlePauseNarration()}}>Pause Narration</button>
+
+            <button class="book-options-button" on:click={() => {handlePlayAll()}}>Play All</button>
+            <button class="book-options-button" on:click={() => {handlePausePlaying()}}>Pause Playing</button>
+
             <button class="book-options-button restore" on:click={() => {handleReloadBook()}}>Undo Changes</button>
             <button class="book-options-button save" on:click={() => {handleSaveChanges()}}>Save Changes</button>
         </div>
