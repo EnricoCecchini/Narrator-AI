@@ -39,6 +39,21 @@ def load_existing_items():
     session['isPlaying'] = False
     session["isNarrating"] = False
 
+    if not os.path.exists(app.config["BOOKS_PATH"]):
+        os.makedirs(app.config["BOOKS_PATH"])
+
+    if not os.path.exists(app.config["SPEAKERS_PATH"]):
+        os.makedirs(app.config["SPEAKERS_PATH"])
+
+    if not os.path.exists(app.config["AUDIOBOOKS_PATH"]):
+        os.makedirs(app.config["AUDIOBOOKS_PATH"])
+
+    if not os.path.exists(app.config["RVC_PATH"]):
+        os.makedirs(app.config["RVC_PATH"])
+
+    if not os.path.exists(app.config["INDEX_PATH"]):
+        os.makedirs(app.config["INDEX_PATH"])
+
     speakers = load_speakers(app.config["SPEAKERS_PATH"])
     books = load_books(app.config["BOOKS_PATH"])
     audiobooks = load_audiobooks(app.config["AUDIOBOOKS_PATH"])
