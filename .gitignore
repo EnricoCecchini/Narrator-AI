@@ -34,3 +34,5 @@ test
 # Ignore python venv
 API/venv
 API/__pycache__
+API/*.pt
+API/ffmpeg.exe

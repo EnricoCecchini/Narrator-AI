@@ -19,6 +19,12 @@ if not exist %VENV_DIR% (
     REM Install requirements
     pip install -r requirements.txt
 
+    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+    pip install -e git+https://github.com/JarodMica/rvc.git#egg=rvc
+
+    pip install -e git+https://github.com/JarodMica/rvc-tts-pipeline.git#egg=rvc_tts_pipe
+
 ) else (
     echo "venv already exists"
 

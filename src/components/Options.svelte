@@ -96,6 +96,13 @@
         selected_rvc.set(event.target.value)
     }
 
+    const handleSelectRVCIndex = async (event) => {
+        console.log(event.target.value)
+
+        // Set selected RVC_index in store
+        selected_index.set(event.target.value)
+    }
+
 </script>
 
 <div class="options-container">
@@ -152,7 +159,7 @@
                     <label for="speakers" class="option-label">Select Index</label>
                 </div>
                 <div class="options-col-row">
-                    <select class="option-dropdown" name='speakers' id='speakers'  on:change={handleSelectRVC}>
+                    <select class="option-dropdown" name='speakers' id='speakers'  on:change={handleSelectRVCIndex}>
                         <option value='' class="options-option">Select Index</option>
                         {#each available_indexes as index}
                             <option value={index}>{index}</option>

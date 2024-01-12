@@ -117,7 +117,8 @@
             book: $selected_book,
             speaker: $selected_speaker,
             rvc_model: $selected_rvc,
-            index: $selected_index
+            index: $selected_index,
+            rvc_index: $selected_index
         }
 
         console.log('BEGIN NARRATION: ', data)
@@ -137,7 +138,8 @@
             index: index,
             book: $selected_book,
             speaker: $selected_speaker,
-            rvc_model: $selected_rvc
+            rvc_model: $selected_rvc,
+            rvc_index: $selected_index
         }
 
         if (data.speaker === '') {
