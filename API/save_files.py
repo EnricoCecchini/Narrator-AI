@@ -1,5 +1,6 @@
 import os
 from rich import print
+import wave
 
 
 # Save book and parse into individual files for each sentence
@@ -186,5 +187,36 @@ def save_index(INDEX_PATH, index):
 # Merge audiobook in audiobooks/BOOK/audiobook
 def merge_audiobook(audiobooks_path, book):
     audiobook_dir = os.path.join(audiobooks_path, book, 'audiobook')
+    audiobook_source = os.path.join(audiobooks_path, book)
 
     print("MERGING AUDIOBOOK: ", audiobook_dir)
+    print("AUDIOBOOK SOURCE: ", audiobook_source)
+
+    if not os.path.exists(audiobook_dir):
+        os.mkdir(audiobook_dir)
+
+    # Get params from first audio
+    with wave.open(os.path.join(audiobook_source, '0.wav'), 'rb') as w:
+        channels = w.getnchannels()
+        sample_width = w.getsampwidth()
+        frame_rate = w.getframerate()
+
+    # Merge all audios in audiobook dir
+    with wave.open(os.path.join(audiobook_dir, 'audiobook.wav'), 'wb') as output:
+        # Set parameters for output
+        output.setnchannels(channels)
+        output.setsampwidth(sample_width)
+        output.setframerate(frame_rate)
+
+        for file in os.listdir(audiobook_source):
+            if file.endswith('.wav'):
+                print("MERGING: ", file)
+                with wave.open(os.path.join(audiobook_source, file), 'rb') as w:
+                    # Set parameters for output
+                    assert (w.getnchannels(), w.getsampwidth(), w.getframerate()) == (channels, sample_width, frame_rate)
+                    output.writeframes(w.readframes(w.getnframes()))
+
+    return {
+        "message": "Audiobook merged succesfully",
+        "success": True
+    }

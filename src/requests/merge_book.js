@@ -12,12 +12,14 @@ export const check_narrated_lines = async (book) => {
 
     const data = await response.json()
 
-    return data.success
+    console.log('CHECK BEFORE MERGE: ', data)
+
+    return data
 }
 
 // Merge all generated audios into single .wav file
 export const merge_book = async (book) => {
-    const response = await fetch(API_ROUTE + `/merge_book`, {
+    const response = await fetch(API_ROUTE + `/merge_audiobook`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

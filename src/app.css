@@ -217,11 +217,6 @@
   font-weight: bold;
 }
 
-.book-options-button.merge {
-  font-weight: bold;
-  grid-column: span 2;
-}
-
 .book-line-button-move {
   display: flex;
   flex-direction: row;

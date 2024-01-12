@@ -242,6 +242,8 @@
         // Check all lines are narrated
         const narrated_lines = await check_narrated_lines(data)
 
+        console.log('NARRATED LINES: ', narrated_lines)
+
         if (!narrated_lines.success) {
             alert('Please narrate all lines before merging book')
 
@@ -249,6 +251,30 @@
         }
 
         const response = await merge_book(data)
+    }
+
+
+    const handlePlayMerged = async () => {
+        const merged_audio_path = `${AUDIO_PATH}\\${$selected_book}\\audiobook\\audiobook.wav`
+
+        console.log('MERGED AUDIO PATH: ', merged_audio_path)
+
+        // Check if audio file exists
+        const audio_exists = await check_audio_exists(merged_audio_path)
+
+        console.log('AUDIO EXISTS: ', audio_exists)
+
+        if (audio_exists) {
+            console.log('AUDIO EXISTS: ', merged_audio_path)
+
+            // Load audio file into audio list using fetch
+            fetch(merged_audio_path)
+                .then(response => response.blob())
+                .then(blob => {
+                    const audio = new Audio(URL.createObjectURL(blob))
+                    audio.play()
+                })
+        }
     }
 
 
@@ -364,6 +390,7 @@
             <button class="book-options-button save" on:click={() => {handleSaveChanges()}}>Save Changes</button>
 
             <button class="book-options-button merge" on:click={() => {handleMergeBook()}}>Merge Book</button>
+            <button class="book-options-button merge" on:click={() => {handlePlayMerged()}}>Play Merged</button>
         </div>
         <div class="voice-settings-container">
             <div class="voice-settings-row">

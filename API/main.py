@@ -364,6 +364,9 @@ def check_all_audios_exist():
     audio_path = os.path.join(app.config["AUDIOBOOKS_PATH"], data['book']['book'])
     existing_audios = os.listdir(audio_path)
 
+    # Remove 'audiobook' dir from list
+    existing_audios.remove('audiobook')
+
     lines_path = os.path.join(app.config["BOOKS_PATH"], data['book']['book'], 'Processed')
     existing_lines = os.listdir(lines_path)
 
@@ -400,22 +403,9 @@ def merge_book():
             'data': []
         })
 
-    elif data['lines'] == []:
-        return jsonify({
-            'message': 'No Lines',
-            'success': False,
-            'error': '',
-            'data': []
-        })
+    resp = merge_audiobook(app.config["AUDIOBOOKS_PATH"], data["book"]['book'])
 
-    merge_audiobook(app.config["AUDIOBOOKS_PATH"], data["book"], data["lines"])
-
-    return jsonify({
-        'message': 'Book merged succesfully',
-        'success': True,
-        'error': '',
-        'data': []
-    })
+    return jsonify(resp)
 
 
 
