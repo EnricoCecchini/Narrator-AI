@@ -42,8 +42,12 @@ def remove_deleted_audios(AUDIOBOOKS_PATH, book, remaining_lines_index):
 
     print("OLD INDEXES: ", old_indexes)
 
+    audio_files = os.listdir(os.path.join(AUDIOBOOKS_PATH, book))
+    if "audiobook" in audio_files:
+        audio_files.remove("audiobook")
+
     # Delete audios by index
-    for file in os.listdir(os.path.join(AUDIOBOOKS_PATH, book)):
+    for file in audio_files:
         try:
             if int(file.replace(".wav", "")) not in old_indexes:
                 print("DELETING: ", file.replace(".wav", ""))
@@ -62,10 +66,15 @@ def reorder_audios(AUDIOBOOKS_PATH, book, remaining_lines_index):
 
     print("REORDERING AUDIOS: ", remaining_lines_index)
     print('AUDIO PATH: ', os.path.join(AUDIOBOOKS_PATH, book))
-    print('FILES: ', os.listdir(os.path.join(AUDIOBOOKS_PATH, book)))
+
+    audio_files = os.listdir(os.path.join(AUDIOBOOKS_PATH, book))
+    if "audiobook" in audio_files:
+        audio_files.remove("audiobook")
+
+    print('FILES: ', audio_files)
 
     # Rename audios to new index
-    for file in os.listdir(os.path.join(AUDIOBOOKS_PATH, book)):
+    for file in audio_files:
         try:
             for l in remaining_lines_index:
                 if l["old_index"] == file.replace(".wav", ""):
@@ -78,7 +87,13 @@ def reorder_audios(AUDIOBOOKS_PATH, book, remaining_lines_index):
 
     # Rename audios to remove -NEW
     print('REMOVE -NEW FROM FILE NAME')
-    for file in os.listdir(os.path.join(AUDIOBOOKS_PATH, book)):
+
+    audio_files = os.listdir(os.path.join(AUDIOBOOKS_PATH, book))
+
+    if "audiobook" in audio_files:
+        audio_files.remove("audiobook")
+
+    for file in audio_files:
         try:
             print('REMOVE -NEW: ', os.path.join(AUDIOBOOKS_PATH, book, file), ' TO: ', os.path.join(AUDIOBOOKS_PATH, book, file.replace('-NEW', '')))
             os.rename(os.path.join(AUDIOBOOKS_PATH, book, file), os.path.join(AUDIOBOOKS_PATH, book, file.replace('-NEW', '')))

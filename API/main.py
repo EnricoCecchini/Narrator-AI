@@ -365,7 +365,8 @@ def check_all_audios_exist():
     existing_audios = os.listdir(audio_path)
 
     # Remove 'audiobook' dir from list
-    existing_audios.remove('audiobook')
+    if "audiobook" in existing_audios:
+        existing_audios.remove("audiobook")
 
     lines_path = os.path.join(app.config["BOOKS_PATH"], data['book']['book'], 'Processed')
     existing_lines = os.listdir(lines_path)

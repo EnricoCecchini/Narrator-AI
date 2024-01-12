@@ -21,6 +21,7 @@
     let book_lines = []
     let audioList = []
     let audio = new Audio()
+    let mergedAudio = new Audio()
     let currentAudioIndex = 0
     let isPaused = true
 
@@ -172,6 +173,8 @@
 
         await handleReloadAudios()
 
+        console.log('CHANGE RESPONSE: ', response)
+
         return response
     }
 
@@ -255,6 +258,8 @@
 
 
     const handlePlayMerged = async () => {
+        isPaused = false
+
         const merged_audio_path = `${AUDIO_PATH}\\${$selected_book}\\audiobook\\audiobook.wav`
 
         console.log('MERGED AUDIO PATH: ', merged_audio_path)
@@ -264,15 +269,15 @@
 
         console.log('AUDIO EXISTS: ', audio_exists)
 
-        if (audio_exists) {
+        if (audio_exists && !isPaused) {
             console.log('AUDIO EXISTS: ', merged_audio_path)
 
             // Load audio file into audio list using fetch
             fetch(merged_audio_path)
                 .then(response => response.blob())
                 .then(blob => {
-                    const audio = new Audio(URL.createObjectURL(blob))
-                    audio.play()
+                    mergedAudio = new Audio(URL.createObjectURL(blob))
+                    mergedAudio.play()
                 })
         }
     }
@@ -327,6 +332,9 @@
     const handlePausePlaying = () => {
         audio.pause()
         audio.currentTime = 0
+
+        mergedAudio.pause()
+        mergedAudio.currentTime = 0
 
         isPaused = true
     }
