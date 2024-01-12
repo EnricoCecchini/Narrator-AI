@@ -1,5 +1,12 @@
 @echo off
 
+REM Install npm packages if not already installed
+if not exist node_modules (
+    npm install
+) else (
+    echo "node_modules already exists"
+)
+
 REM Start new CMD and run Svelte app
 start cmd /k npm run dev
 
