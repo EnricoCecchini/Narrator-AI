@@ -65,3 +65,7 @@ Svelte app to generate audiobooks locally using XTTS
 
 ## Known Bugs
 - Might have to reload the page sometimes for changes to work
+
+
+## Credits
+I am using coqui-ai's `TTS` and Jarod Mica's (`Jarods Journey` on youtube) `rvc-tts-pipeline` for the voice generation.
