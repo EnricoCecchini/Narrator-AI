@@ -23,13 +23,22 @@ dist-ssr
 *.sln
 *.sw?
 
-# Ignore books, audiobooks, speakers and models
+# Ignore the content within specific folders
 static/books/*
 static/audiobooks/*
 static/speakers/*
 static/rvcModels/*
 static/index/*
-test
+
+# Allow the folders themselves
+!static/books/
+!static/audiobooks/
+!static/speakers/
+!static/rvcModels/
+!static/index/
+
+# Ignore the 'test' folder and its content
+test/
 
 # Ignore python venv
 API/venv
