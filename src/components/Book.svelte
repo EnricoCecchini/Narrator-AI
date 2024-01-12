@@ -244,6 +244,8 @@
             index: $selected_index
         }
 
+        await handleSaveChanges()
+
         // Check all lines are narrated
         const narrated_lines = await check_narrated_lines(data)
 
