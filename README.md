@@ -26,7 +26,7 @@ Svelte app to generate audiobooks locally using XTTS
 - [x] Re-narrate selected line
 
 ## Future Plans
-- [ ] Implement RVC
+- [x] Implement RVC
 - [ ] Implement multi-lang
 
 
