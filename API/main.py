@@ -10,7 +10,8 @@ from narrator import narrate_all, narrate_line
 from play_audio import play_audio
 from rich import print
 from save_files import (remove_deleted_audios, reorder_audios, save_book,
-                        save_index, save_rvc, save_speaker, update_book)
+                        save_index, save_rvc, save_speaker, update_book,
+                        merge_audiobook)
 
 from classes import Narrator
 
@@ -344,6 +345,77 @@ def check_audio_exists(audio_path="Hello"):
             'error': '',
             'data': []
         })
+
+
+@app.route('/check_all_audios_exist', methods=['GET', 'POST'])
+def check_all_audios_exist():
+    data = request.get_json()
+
+    print('CHECK ALL AUDIOS EXIST: ', data)
+
+    if data['book'] == '':
+        return jsonify({
+            'message': 'No Book',
+            'success': False,
+            'error': '',
+            'data': []
+        })
+
+    audio_path = os.path.join(app.config["AUDIOBOOKS_PATH"], data['book']['book'])
+    existing_audios = os.listdir(audio_path)
+
+    lines_path = os.path.join(app.config["BOOKS_PATH"], data['book']['book'], 'Processed')
+    existing_lines = os.listdir(lines_path)
+
+    print('EXISTING AUDIOS: ', existing_audios)
+    print('EXISTING LINES: ', existing_lines)
+
+    if len(existing_audios) != len(existing_lines):
+        return jsonify({
+            'message': 'Not all audios exist',
+            'success': False,
+            'error': '',
+            'data': []
+        })
+
+    return jsonify({
+        'message': 'All audios exist',
+        'success': True,
+        'error': '',
+        'data': []
+    })
+
+
+@app.route('/merge_audiobook', methods=['GET', 'POST'])
+def merge_book():
+    data = request.get_json()
+
+    print('MERGE BOOK: ', data)
+
+    if data['book'] == '':
+        return jsonify({
+            'message': 'No Book',
+            'success': False,
+            'error': '',
+            'data': []
+        })
+
+    elif data['lines'] == []:
+        return jsonify({
+            'message': 'No Lines',
+            'success': False,
+            'error': '',
+            'data': []
+        })
+
+    merge_audiobook(app.config["AUDIOBOOKS_PATH"], data["book"], data["lines"])
+
+    return jsonify({
+        'message': 'Book merged succesfully',
+        'success': True,
+        'error': '',
+        'data': []
+    })
 
 
 

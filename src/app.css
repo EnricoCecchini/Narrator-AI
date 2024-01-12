@@ -193,6 +193,9 @@
 
 .book-options {
   margin-left: 5vw;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em
 }
 
 .book-options-button {
@@ -212,6 +215,11 @@
 .book-options-button.save {
   background-color: darkgreen;
   font-weight: bold;
+}
+
+.book-options-button.merge {
+  font-weight: bold;
+  grid-column: span 2;
 }
 
 .book-line-button-move {

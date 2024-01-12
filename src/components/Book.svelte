@@ -15,6 +15,7 @@
     import { narrate_book } from '../requests/narrate_book'
     import { pause_narration } from '../requests/pause_narration'
     import { check_audio_exists } from '../requests/check_audio_exists'
+    import { merge_book, check_narrated_lines } from '../requests/merge_book'
 
 
     let book_lines = []
@@ -229,6 +230,28 @@
     }
 
 
+    // Merge generated audios in single audiobook
+    const handleMergeBook = async () => {
+        const data = {
+            book: $selected_book,
+            speaker: $selected_speaker,
+            rvc_model: $selected_rvc,
+            index: $selected_index
+        }
+
+        // Check all lines are narrated
+        const narrated_lines = await check_narrated_lines(data)
+
+        if (!narrated_lines.success) {
+            alert('Please narrate all lines before merging book')
+
+            return
+        }
+
+        const response = await merge_book(data)
+    }
+
+
     const playNextLine = async () => {
         console.log('PLAY NEXT LINE: ', currentAudioIndex)
         console.log('AUDIO LIST PLAYING: ', audioList)
@@ -261,10 +284,6 @@
                     console.log('ERROR PLAYING LINE: ', e)
                 }
             }
-
-            //console.log('AUDIO PLAYED: ', audio)
-            // currentAudioIndex += 1
-            // playNextLine()
         }
     }
 
@@ -343,6 +362,8 @@
 
             <button class="book-options-button restore" on:click={() => {handleReloadBook()}}>Undo Changes</button>
             <button class="book-options-button save" on:click={() => {handleSaveChanges()}}>Save Changes</button>
+
+            <button class="book-options-button merge" on:click={() => {handleMergeBook()}}>Merge Book</button>
         </div>
         <div class="voice-settings-container">
             <div class="voice-settings-row">

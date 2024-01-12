@@ -181,3 +181,10 @@ def save_index(INDEX_PATH, index):
         "message": "Index uploaded succesfully",
         "success": True
     }
+
+
+# Merge audiobook in audiobooks/BOOK/audiobook
+def merge_audiobook(audiobooks_path, book):
+    audiobook_dir = os.path.join(audiobooks_path, book, 'audiobook')
+
+    print("MERGING AUDIOBOOK: ", audiobook_dir)
