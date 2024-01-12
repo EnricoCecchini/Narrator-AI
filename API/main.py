@@ -25,7 +25,7 @@ app.secret_key = "tts"
 app.config["BOOKS_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'books')
 app.config["SPEAKERS_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'speakers')
 app.config["AUDIOBOOKS_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'audiobooks')
-app.config["RVC_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'rvc_models')
+app.config["RVC_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'rvcModels')
 app.config["INDEX_PATH"] = os.path.join(os.getenv("STATIC_PATH"), 'index')
 
 app.config["isNarrating"] = False
@@ -123,7 +123,8 @@ def narrate_line_route():
             "book": data["book"],
             "rvc_model": data["rvc_model"],
             "index": data["index"],
-            "line": data["line"]
+            "line": data["line"],
+            "rvc_index": data["rvc_index"]
         }
 
         print("line: ", narration_data["line"])
@@ -156,11 +157,11 @@ def narrate_line_route():
             speaker=narration_data["speaker"],
             speakers_path=app.config["SPEAKERS_PATH"],
             rvc=narration_data["rvc_model"],
-            index=narration_data["index"]
+            index=narration_data["rvc_index"]
         )
 
         # Narrate line
-        narrate_line(narration_data["line"], narration_data, app.config["AUDIOBOOKS_PATH"], narrator)
+        narrate_line(narration_data["line"], narration_data, app.config["AUDIOBOOKS_PATH"], app.config["RVC_PATH"], app.config["INDEX_PATH"], narrator)
 
     return jsonify({'message': 'Line narrated succesfully', 'success': True, 'error': '', 'data': []})
 
@@ -189,7 +190,8 @@ def narrate_entire_audiobook():
             "speaker": data["speaker"],
             "book": data["book"],
             "rvc_model": data["rvc_model"],
-            "index": data["index"]
+            "index": data["index"],
+            "rvc_index": data["rvc_index"]
         }
 
         if narration_data["speaker"] == "":
@@ -212,7 +214,7 @@ def narrate_entire_audiobook():
             speaker=narration_data["speaker"],
             speakers_path=app.config["SPEAKERS_PATH"],
             rvc=narration_data["rvc_model"],
-            index=narration_data["index"]
+            index=narration_data["rvc_index"]
         )
 
         # Load lines from book
@@ -222,7 +224,8 @@ def narrate_entire_audiobook():
             "speaker": narration_data["speaker"],
             "book": narration_data["book"],
             "rvc_model": narration_data["rvc_model"],
-            "index": narration_data["index"]
+            "index": narration_data["index"],
+            "rvc_index": narration_data["rvc_index"]
         }
 
         # Start narration thread
