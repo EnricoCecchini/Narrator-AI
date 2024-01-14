@@ -139,7 +139,9 @@ def narrate_line_route():
             "rvc_model": data["rvc_model"],
             "index": data["index"],
             "line": data["line"],
-            "rvc_index": data["rvc_index"]
+            "rvc_index": data["rvc_index"],
+            "index_effect": data["index_effect"],
+            "voice_pitch": data["voice_pitch"]
         }
 
         print("line: ", narration_data["line"])
@@ -206,7 +208,9 @@ def narrate_entire_audiobook():
             "book": data["book"],
             "rvc_model": data["rvc_model"],
             "index": data["index"],
-            "rvc_index": data["rvc_index"]
+            "rvc_index": data["rvc_index"],
+            "index_effect": data["index_effect"],
+            "voice_pitch": data["voice_pitch"]
         }
 
         if narration_data["speaker"] == "":

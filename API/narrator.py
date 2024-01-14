@@ -81,6 +81,8 @@ def narrate_line(line, narration_data, AUDIOBOOKS_PATH, RVC_PATH, INDEX_PATH, na
         model_path=rvc_path,
         file_index=rvc_index_path,
         input_path=new_audio,
+        f0_up_key=narration_data["voice_pitch"],
+        index_rate=narration_data["index_effect"]
     )
 
     # Delete old audio
