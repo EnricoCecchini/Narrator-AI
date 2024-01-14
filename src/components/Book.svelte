@@ -6,7 +6,7 @@
                 selected_speaker,
                 selected_rvc,
                 selected_index,
-                AUDIO_PATH
+                AUDIO_PATH,
     } from '../../static/store'
 
     import { narrate_line } from '../requests/narrate_line'
@@ -24,6 +24,9 @@
     let mergedAudio = new Audio()
     let currentAudioIndex = 0
     let isPaused = true
+
+    let index_effect = 0
+    let voice_pitch = 0
 
 
     const unsubscribeSelectedLines = selected_book_lines.subscribe(value => {
@@ -118,7 +121,9 @@
             speaker: $selected_speaker,
             rvc_model: $selected_rvc,
             index: $selected_index,
-            rvc_index: $selected_index
+            rvc_index: $selected_index,
+            index_effect: index_effect / 100,
+            voice_pitch: voice_pitch
         }
 
         console.log('BEGIN NARRATION: ', data)
@@ -139,7 +144,9 @@
             book: $selected_book,
             speaker: $selected_speaker,
             rvc_model: $selected_rvc,
-            rvc_index: $selected_index
+            rvc_index: $selected_index,
+            index_effect: index_effect / 100,
+            voice_pitch: voice_pitch
         }
 
         if (data.speaker === '') {
@@ -406,13 +413,13 @@
         </div>
         <div class="voice-settings-container">
             <div class="voice-settings-row">
-                <label for="voice-settings" class="voice-settings-label">Index Effect</label>
-                <input type="range" min="0" max="100" value="50" class="voice-settings-slider" id="volume-slider">
+                <label for="voice-settings" class="voice-settings-label">Index Effect {index_effect/100}</label>
+                <input type="range" bind:value={index_effect} min="0" max="100" class="voice-settings-slider" id="volume-slider">
             </div>
 
             <div class="voice-settings-row">
-                <label for="voice-settings" class="voice-settings-label">Voice Pitch</label>
-                <input type="range" min="0" max="100" value="50" class="voice-settings-slider" id="volume-slider">
+                <label for="voice-settings" class="voice-settings-label">Voice Pitch {voice_pitch}</label>
+                <input type="range" bind:value={voice_pitch} min="-16" max="16" class="voice-settings-slider" id="volume-slider">
             </div>
         </div>
     </div>
