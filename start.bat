@@ -39,6 +39,36 @@ if not exist %VENV_DIR% (
     call venv/Scripts/activate
 )
 
+REM Check if curl is available
+where curl >nul 2>nul
+if %errorlevel% neq 0 (
+    echo "Error: curl is not found in the system's PATH. Please install curl."
+    exit /b 1
+)
+
+REM Download hubert_base.pt, rmvpe.pt, and ffmpeg.exe and store in the API directory
+if not exist "hubert_base.pt" (
+    echo "Downloading hubert_base.pt"
+    curl -L -o "hubert_base.pt" "https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/hubert_base.pt?download=true"
+) else (
+    echo "hubert_base.pt already exists"
+)
+
+if not exist "rmvpe.pt" (
+    echo "Downloading rmvpe.pt"
+    curl -L -o "rmvpe.pt" "https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/rmvpe.pt?download=true"
+) else (
+    echo "rmvpe.pt already exists"
+)
+
+if not exist "ffmpeg.exe" (
+    echo "Downloading ffmpeg.exe"
+    curl -L -o "ffmpeg.exe" "https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/main/ffmpeg.exe?download=true"
+) else (
+    echo "ffmpeg.exe already exists"
+)
+
+
 REM Run API
 python main.py
 

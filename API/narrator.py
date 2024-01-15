@@ -7,6 +7,8 @@ from rvc_infer import rvc_convert
 def narrate_all(lines, app, narration_data, narrator):
     audio_path = os.path.join(app.config["AUDIOBOOKS_PATH"], narration_data["book"])
 
+    print("NARRATING ALL: ", audio_path)
+
     message = ""
 
     # Check if audiobook exists

@@ -5,11 +5,7 @@ Svelte app to generate audiobooks locally using XTTS
 ## Installation
 1. Install Python 3.10+
 
-2. Download `hubert_base.pt` and `rmvpe.pt` from Huggingface and place in API dir
-
-3. Download and place `ffmpeg.exe` in API dir
-
-3. Run start.bat (Run 2 times, first time it will install npm packages, second time it will create venv, install requirements and run the app)
+2. Run start.bat (Run 2 times, first time it will install npm packages, second time it will create venv, install requirements and run the app)
 
 
 ## How to Use

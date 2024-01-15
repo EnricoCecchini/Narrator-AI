@@ -64,9 +64,11 @@ def load_selected_book(BOOKS_PATH, book):
     book_lines = []
     file_path = ''
 
+    book_length = len(os.listdir(processed_path))
+
     try:
-        for file in os.listdir(processed_path):
-            file_path = os.path.join(processed_path, file)
+        for i in range(book_length):
+            file_path = os.path.join(processed_path, f'{i}.txt')
 
             # Read file content into list
             with open(file_path, 'r', encoding='utf-8') as f:
