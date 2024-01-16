@@ -27,8 +27,8 @@ Svelte app to generate audiobooks locally using XTTS
 | Save Changes | Saves changes made to book (Reorder\Add\Delete lines) | YES |
 | Merge Book | Merge generated audios for all lines in single wav file | YES |
 | Play Merged | Play merged audiobook | NO |
-| Index Effect | Change the strength of the index (NOT IMPLEMENTED) | NO |
-| Voice Pitch | Change the pitch for the generated voice (NOT IMPLEMENTED) | NO |
+| Index Effect | Change the strength of the index | NO |
+| Voice Pitch | Change the pitch for the generated voice | NO |
 
 
 # Book Editing Guide
