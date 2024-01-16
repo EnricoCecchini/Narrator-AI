@@ -16,6 +16,7 @@
     import { pause_narration } from '../requests/pause_narration'
     import { check_audio_exists } from '../requests/check_audio_exists'
     import { merge_book, check_narrated_lines } from '../requests/merge_book'
+    import { narrate_missing_lines } from '../requests/narrate_missing_lines'
 
 
     let book_lines = []
@@ -77,6 +78,37 @@
         selected_book_lines.set(book_lines)
         //audioList = new Array(book_lines.length)
         console.log('AUDIO LIST: ', audioList)
+    }
+
+
+    // Begin Book Narration
+    const handleMissingLines = async () => {
+
+        let resp = await handleSaveChanges()
+
+        console.log('RESP', resp)
+
+        if (!resp.success) {
+            alert('Please save changes before narrating book')
+
+            return
+        }
+
+        const data = {
+            book: $selected_book,
+            speaker: $selected_speaker,
+            rvc_model: $selected_rvc,
+            index: $selected_index,
+            rvc_index: $selected_index,
+            index_effect: index_effect / 100,
+            voice_pitch: voice_pitch
+        }
+
+        console.log('BEGIN NARRATION: ', data)
+
+        const response = await narrate_missing_lines(data)
+
+        await handleReloadBook()
     }
 
 
@@ -434,6 +466,7 @@
     <div class="generation-settings">
         <div class="book-options">
             <button class="book-options-button" on:click={() => {handleNarrateBook()}}>Narrate All</button>
+            <button class="book-options-button" on:click={() => {handleMissingLines()}}>Narrate Missing</button>
             <button class="book-options-button" on:click={() => {handlePauseNarration()}}>Pause Narration</button>
 
             <button class="book-options-button" on:click={() => {handlePlayAll()}}>Play All</button>

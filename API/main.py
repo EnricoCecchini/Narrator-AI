@@ -6,7 +6,7 @@ from flask import Flask, jsonify, request, session
 from flask_cors import CORS
 from load_files import (load_audiobooks, load_books, load_index_files,
                         load_rvc_models, load_selected_book, load_speakers)
-from narrator import narrate_all, narrate_line
+from narrator import narrate_all, narrate_line, narrate_missing
 from play_audio import play_audio
 from rich import print
 from save_files import (remove_deleted_audios, reorder_audios, save_book,
@@ -178,9 +178,94 @@ def narrate_line_route():
         )
 
         # Narrate line
-        narrate_line(narration_data["line"], narration_data, app.config["AUDIOBOOKS_PATH"], app.config["RVC_PATH"], app.config["INDEX_PATH"], narrator)
+        narrate_line(
+            narration_data["line"],
+            narration_data,
+            app.config["AUDIOBOOKS_PATH"],
+            app.config["RVC_PATH"],
+            app.config["INDEX_PATH"],
+            narrator
+        )
 
     return jsonify({'message': 'Line narrated succesfully', 'success': True, 'error': '', 'data': []})
+
+
+# Narrate Missing Lines
+@app.route("/narrate_missing_lines", methods=["POST", "GET"])
+def narrate_missing_lines():
+    print("NARRATE MISSING LINES")
+
+    if request.method == "POST":
+        if app.config["isNarrating"]:
+            print("Already narrating")
+
+            return jsonify({
+                'message': 'Already narrating',
+                'success': False,
+                'error': '',
+                'data': []
+            })
+
+        app.config["isNarrating"] = True
+
+        data = request.get_json()
+
+        # print("NARRATE BOOK: ")
+
+        narration_data = {
+            "speaker": data["speaker"],
+            "book": data["book"],
+            "rvc_model": data["rvc_model"],
+            "index": data["index"],
+            "rvc_index": data["rvc_index"],
+            "index_effect": data["index_effect"],
+            "voice_pitch": data["voice_pitch"]
+        }
+
+        if narration_data["speaker"] == "":
+            return jsonify({
+                'message': 'No Speaker',
+                'success': False,
+                'error': '',
+                'data': []
+            })
+
+        elif narration_data["book"] == "":
+            return jsonify({
+                'message': 'No Book',
+                'success': False,
+                'error': '',
+                'data': []
+            })
+
+        narrator = Narrator(
+            speaker=narration_data["speaker"],
+            speakers_path=app.config["SPEAKERS_PATH"],
+            rvc=narration_data["rvc_model"],
+            index=narration_data["rvc_index"]
+        )
+
+        # Load lines from book
+        lines = load_selected_book(app.config["BOOKS_PATH"], narration_data["book"])
+
+        session["narration_data"] = {
+            "speaker": narration_data["speaker"],
+            "book": narration_data["book"],
+            "rvc_model": narration_data["rvc_model"],
+            "index": narration_data["index"],
+            "rvc_index": narration_data["rvc_index"]
+        }
+
+        # Start narration thread
+        narration_thread = threading.Thread(target=narrate_missing, args=[lines, app, narration_data, narrator])
+        narration_thread.start()
+
+    return jsonify({
+        'message': 'Missing lines narrated succesfully',
+        'success': True,
+        'error': '',
+        'data': []
+    })
 
 
 # Narrate entire book
@@ -252,7 +337,7 @@ def narrate_entire_audiobook():
         narration_thread.start()
 
     return jsonify({
-        'message': 'Book narrated succesfully',
+        'message': 'Narration started succesfully',
         'success': True,
         'error': '',
         'data': []
@@ -281,7 +366,7 @@ def pause_narration():
 def save_book_changes():
     data = request.get_json()
 
-    print('SAVE BOOK CHANGES: ', data)
+    # print('SAVE BOOK CHANGES: ', data)
 
     if data['book'] == '':
         return jsonify({
@@ -308,7 +393,7 @@ def save_book_changes():
             'new_index': i,
             'old_index': line['path'].split('\\')[-1].replace('.txt', '')
         }
-        print(i, line)
+        # print(i, line)
 
         remaining_lines_index.append(new_line)
 
@@ -337,8 +422,8 @@ def save_book_changes():
 def check_audio_exists(audio_path="Hello"):
     audio_path = request.json['audio_path']
 
-    print('\n\nCHECKING AUDIO!!!\n')
-    print('CHECK AUDIO EXISTS: ', audio_path)
+    # print('\n\nCHECKING AUDIO!!!\n')
+    # print('CHECK AUDIO EXISTS: ', audio_path)
 
     if not audio_path:
         return jsonify({
@@ -350,7 +435,7 @@ def check_audio_exists(audio_path="Hello"):
 
     audio_path = audio_path.replace('%20', ' ')
 
-    print('CHECK AUDIO EXISTS: ', audio_path)
+    # print('CHECK AUDIO EXISTS: ', audio_path)
 
     if os.path.exists(audio_path):
         return jsonify({
@@ -373,7 +458,7 @@ def check_audio_exists(audio_path="Hello"):
 def check_all_audios_exist():
     data = request.get_json()
 
-    print('CHECK ALL AUDIOS EXIST: ', data)
+    # print('CHECK ALL AUDIOS EXIST: ', data)
 
     if data['book'] == '':
         return jsonify({
@@ -393,8 +478,8 @@ def check_all_audios_exist():
     lines_path = os.path.join(app.config["BOOKS_PATH"], data['book']['book'], 'Processed')
     existing_lines = os.listdir(lines_path)
 
-    print('EXISTING AUDIOS: ', existing_audios)
-    print('EXISTING LINES: ', existing_lines)
+    # print('EXISTING AUDIOS: ', existing_audios)
+    # print('EXISTING LINES: ', existing_lines)
 
     if len(existing_audios) != len(existing_lines):
         return jsonify({
@@ -416,7 +501,7 @@ def check_all_audios_exist():
 def merge_book():
     data = request.get_json()
 
-    print('MERGE BOOK: ', data)
+    # print('MERGE BOOK: ', data)
 
     if data['book'] == '':
         return jsonify({
