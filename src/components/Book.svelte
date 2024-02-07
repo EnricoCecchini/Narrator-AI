@@ -6,7 +6,7 @@
                 selected_speaker,
                 selected_rvc,
                 selected_index,
-                AUDIO_PATH
+                AUDIO_PATH,
     } from '../../static/store'
 
     import { narrate_line } from '../requests/narrate_line'
@@ -16,14 +16,19 @@
     import { pause_narration } from '../requests/pause_narration'
     import { check_audio_exists } from '../requests/check_audio_exists'
     import { merge_book, check_narrated_lines } from '../requests/merge_book'
+    import { narrate_missing_lines } from '../requests/narrate_missing_lines'
 
 
     let book_lines = []
     let audioList = []
-    let audio = new Audio()
-    let mergedAudio = new Audio()
+
+    let audio = null
+    let mergedAudio = null
     let currentAudioIndex = 0
     let isPaused = true
+
+    let index_effect = 0
+    let voice_pitch = 0
 
 
     const unsubscribeSelectedLines = selected_book_lines.subscribe(value => {
@@ -39,31 +44,7 @@
     }
 
 
-    // Play selected line
-    const handlePlayLine = async (index) => {
-        console.log('AUDIO SOURCE: ', `${AUDIO_PATH}\\${$selected_book}\\${index}.wav`)
-        audio = audioList[index]
 
-        console.log('AUDIO: ', audio)
-        console.log('AUDIO LIST PLAY: ', audioList)
-
-        try {
-            // If not playing, play audio
-            if (audio.paused) {
-                // Reset audio to beginning
-                audio.currentTime = 0
-
-                // audio.load()
-                audio.play()
-            } else {
-                // If playing, pause audio
-                audio.pause()
-            }
-        } catch (e) {
-            console.log('ERROR PLAYING LINE: ', e)
-            alert('ERROR PLAYING LINE: ' + e)
-        }
-    }
 
 
     // Add line below selected line
@@ -101,6 +82,37 @@
 
 
     // Begin Book Narration
+    const handleMissingLines = async () => {
+
+        let resp = await handleSaveChanges()
+
+        console.log('RESP', resp)
+
+        if (!resp.success) {
+            alert('Please save changes before narrating book')
+
+            return
+        }
+
+        const data = {
+            book: $selected_book,
+            speaker: $selected_speaker,
+            rvc_model: $selected_rvc,
+            index: $selected_index,
+            rvc_index: $selected_index,
+            index_effect: index_effect / 100,
+            voice_pitch: voice_pitch
+        }
+
+        console.log('BEGIN NARRATION: ', data)
+
+        const response = await narrate_missing_lines(data)
+
+        await handleReloadBook()
+    }
+
+
+    // Begin Book Narration
     const handleNarrateBook = async () => {
 
         let resp = await handleSaveChanges()
@@ -118,7 +130,9 @@
             speaker: $selected_speaker,
             rvc_model: $selected_rvc,
             index: $selected_index,
-            rvc_index: $selected_index
+            rvc_index: $selected_index,
+            index_effect: index_effect / 100,
+            voice_pitch: voice_pitch
         }
 
         console.log('BEGIN NARRATION: ', data)
@@ -139,7 +153,9 @@
             book: $selected_book,
             speaker: $selected_speaker,
             rvc_model: $selected_rvc,
-            rvc_index: $selected_index
+            rvc_index: $selected_index,
+            index_effect: index_effect / 100,
+            voice_pitch: voice_pitch
         }
 
         if (data.speaker === '') {
@@ -244,6 +260,8 @@
             index: $selected_index
         }
 
+        await handleSaveChanges()
+
         // Check all lines are narrated
         const narrated_lines = await check_narrated_lines(data)
 
@@ -259,7 +277,41 @@
     }
 
 
+    const handlePlayLine = async (index) => {
+        // Pause audio if playing
+        await handlePausePlaying()
+
+        isPaused = false
+
+        console.log('AUDIO SOURCE: ', `${AUDIO_PATH}\\${$selected_book}\\${index}.wav`)
+        audio = audioList[index]
+        audio.currentTime = 0
+
+        console.log('AUDIO: ', audio)
+        console.log('AUDIO LIST PLAY: ', audioList)
+
+        try {
+            // If not playing, play audio
+            if (audio) {
+                // Reset audio to beginning
+                audio.currentTime = 0
+
+                // Use await to ensure playback completes before moving on
+                await audio.play()
+            } else {
+                // If playing, pause audio
+                audio.pause()
+            }
+        } catch (e) {
+            console.log('ERROR PLAYING LINE: ', e)
+            alert('ERROR PLAYING LINE: ' + e)
+        }
+    }
+
     const handlePlayMerged = async () => {
+        // Pause audio if playing
+        await handlePausePlaying()
+
         isPaused = false
 
         const merged_audio_path = `${AUDIO_PATH}\\${$selected_book}\\audiobook\\audiobook.wav`
@@ -275,38 +327,47 @@
             console.log('AUDIO EXISTS: ', merged_audio_path)
 
             // Load audio file into audio list using fetch
-            fetch(merged_audio_path)
+            await fetch(merged_audio_path)
                 .then(response => response.blob())
-                .then(blob => {
+                .then(async blob => {
                     mergedAudio = new Audio(URL.createObjectURL(blob))
-                    mergedAudio.play()
+                    // Use await to ensure playback completes before moving on
+                    await mergedAudio.play()
                 })
         }
     }
-
 
     const playNextLine = async () => {
         console.log('PLAY NEXT LINE: ', currentAudioIndex)
         console.log('AUDIO LIST PLAYING: ', audioList)
 
-        if (currentAudioIndex <= audioList.length && !isPaused) {
+        if (currentAudioIndex < audioList.length && !isPaused) {
             audio = audioList[currentAudioIndex]
 
-            console.log('CURRENT ADUIO: ', audio)
+            if (audio) {
+                // Use await to ensure playback completes before moving on
+                await audio.pause()
+                audio.currentTime = 0
+            }
+
+            console.log('CURRENT AUDIO: ', audio)
 
             try {
                 if (audio !== null) {
+                    // Use await to ensure playback completes before moving on
                     await audio.play()
 
-                    audio.addEventListener('ended', () => {
+                    const endedCallback = async () => {
                         console.log('AUDIO ENDED')
+                        audio.removeEventListener('ended', endedCallback)
                         currentAudioIndex += 1
-                        playNextLine()
-                    })
+                        await playNextLine()
+                    }
 
+                    audio.addEventListener('ended', endedCallback)
                 } else {
                     currentAudioIndex += 1
-                    playNextLine()
+                    await playNextLine()
                 }
             } catch (e) {
                 console.log('ERROR PLAYING LINE: ', e)
@@ -320,23 +381,37 @@
         }
     }
 
-
     const handlePlayAll = async () => {
         console.log('PLAY ALL')
 
+        // Pause audio if playing
+        await handlePausePlaying()
+
+        audio = audioList[0]
+        audio.currentTime = 0
+
         isPaused = false
         currentAudioIndex = 0
+        // Use await to ensure playback completes before moving on
         await playNextLine()
     }
 
-
     // Pause playing all audio
-    const handlePausePlaying = () => {
-        audio.pause()
+    const handlePausePlaying = async () => {
+        if (audio) {
+            // Use await to ensure playback completes before moving on
+            await audio.pause()
+            audio.currentTime = 0
+        }
+
+        audio = audioList[0]
         audio.currentTime = 0
 
-        mergedAudio.pause()
-        mergedAudio.currentTime = 0
+        if (mergedAudio) {
+            // Use await to ensure playback completes before moving on
+            await mergedAudio.pause()
+            mergedAudio.currentTime = 0
+        }
 
         isPaused = true
     }
@@ -391,6 +466,7 @@
     <div class="generation-settings">
         <div class="book-options">
             <button class="book-options-button" on:click={() => {handleNarrateBook()}}>Narrate All</button>
+            <button class="book-options-button" on:click={() => {handleMissingLines()}}>Narrate Missing</button>
             <button class="book-options-button" on:click={() => {handlePauseNarration()}}>Pause Narration</button>
 
             <button class="book-options-button" on:click={() => {handlePlayAll()}}>Play All</button>
@@ -404,13 +480,13 @@
         </div>
         <div class="voice-settings-container">
             <div class="voice-settings-row">
-                <label for="voice-settings" class="voice-settings-label">Index Effect</label>
-                <input type="range" min="0" max="100" value="50" class="voice-settings-slider" id="volume-slider">
+                <label for="voice-settings" class="voice-settings-label">Index Effect {index_effect/100}</label>
+                <input type="range" bind:value={index_effect} min="0" max="100" class="voice-settings-slider" id="volume-slider">
             </div>
 
             <div class="voice-settings-row">
-                <label for="voice-settings" class="voice-settings-label">Voice Pitch</label>
-                <input type="range" min="0" max="100" value="50" class="voice-settings-slider" id="volume-slider">
+                <label for="voice-settings" class="voice-settings-label">Voice Pitch {voice_pitch}</label>
+                <input type="range" bind:value={voice_pitch} min="-16" max="16" class="voice-settings-slider" id="volume-slider">
             </div>
         </div>
     </div>

@@ -7,6 +7,8 @@ from rvc_infer import rvc_convert
 def narrate_all(lines, app, narration_data, narrator):
     audio_path = os.path.join(app.config["AUDIOBOOKS_PATH"], narration_data["book"])
 
+    print("NARRATING ALL: ", audio_path)
+
     message = ""
 
     # Check if audiobook exists
@@ -31,6 +33,45 @@ def narrate_all(lines, app, narration_data, narrator):
         "message": message,
         "success": True
     }
+
+
+# Narrate missing lines in book
+def narrate_missing(lines, app, narration_data, narrator):
+    audio_path = os.path.join(app.config["AUDIOBOOKS_PATH"], narration_data["book"])
+
+    print("NARRATING MISSING: ", audio_path)
+
+    message = ""
+
+    # Check if audiobook exists
+    if not os.path.exists(audio_path):
+        os.mkdir(audio_path)
+
+    # Iterate lines in book
+    for line in lines:
+        line_index = line['path'].split('\\')[-1].replace('.txt', '')
+        print('LINE INDEX: ', line_index)
+
+        # If line is missing, narrate
+        if not os.path.exists(os.path.join(audio_path, f'{line_index}.wav')):
+            print('NARRATING: ', app.config["isNarrating"])
+
+            # Check if narration is paused
+            if not app.config["isNarrating"]:
+                message = "Narration paused"
+                print(message)
+                break
+
+            # Narrate line
+            if line['line'] != "":
+                narrate_line(line, narration_data, app.config["AUDIOBOOKS_PATH"], app.config["RVC_PATH"], app.config["INDEX_PATH"], narrator)
+
+    return {
+        "message": message,
+        "success": True
+    }
+
+
 
 
 # Narrate single line
@@ -71,16 +112,18 @@ def narrate_line(line, narration_data, AUDIOBOOKS_PATH, RVC_PATH, INDEX_PATH, na
     rvc_path = os.path.join(RVC_PATH, narration_data["rvc_model"])
     rvc_index_path = os.path.join(INDEX_PATH, narration_data["rvc_index"])
 
-    print("RVC PATH: ", rvc_path)
-    print("RVC INDEX PATH: ", rvc_index_path)
+    # print("RVC PATH: ", rvc_path)
+    # print("RVC INDEX PATH: ", rvc_index_path)
 
     new_audio = os.path.join(audio_path, f'{line_index}.wav').replace('/', '\\').replace('\\', '\\\\')
-    print("CURRENT AUDIO PATH: ", new_audio)
+    # print("CURRENT AUDIO PATH: ", new_audio)
 
     rvc_convert(
         model_path=rvc_path,
         file_index=rvc_index_path,
         input_path=new_audio,
+        f0_up_key=narration_data["voice_pitch"],
+        index_rate=narration_data["index_effect"]
     )
 
     # Delete old audio
