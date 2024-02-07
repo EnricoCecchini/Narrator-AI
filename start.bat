@@ -1,9 +1,16 @@
 @echo off
 
+REM Install npm packages if not already installed
+if not exist node_modules (
+    npm ci --quiet
+) else (
+    echo "node_modules already exists"
+)
+
 REM Start new CMD and run Svelte app
 start cmd /k npm run dev
 
-REM timeout /t 5
+timeout /t 5
 
 REM CD into API directory and start venv in new CMD
 cd API
