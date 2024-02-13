@@ -44,9 +44,6 @@
     }
 
 
-
-
-
     // Add line below selected line
     const handleAddLineBelow = async (index) => {
         book_lines.splice(index + 1, 0, {'line': '', 'path': ''})

@@ -22,6 +22,7 @@
 
     onMount(async () => {
         await load_existing_files()
+
         console.log('BOOKS EXISTING: ', $existing_books)
 
         await handleParseOptions()
@@ -47,10 +48,25 @@
     }
 
     const handleParseOptions = async () => {
-        available_books = JSON.parse($existing_books)
-        available_speakers = JSON.parse($existing_speakers)
-        available_rvc = JSON.parse($existing_rvc)
-        available_indexes = JSON.parse($existing_rvc_index)
+        await existing_books.subscribe(value => {
+            available_books = JSON.parse(value)
+            console.log('SUBSCRIBE BOOKS: ', available_books)
+        })
+
+        await existing_speakers.subscribe(value => {
+            available_speakers = JSON.parse(value)
+            console.log('SUBSCRIBE Speakers: ', available_speakers)
+        })
+
+        await existing_rvc.subscribe(value => {
+            available_rvc = JSON.parse(value)
+            console.log('SUBSCRIBE RVC: ', available_speakers)
+        })
+
+        await existing_rvc_index.subscribe(value => {
+            available_indexes = JSON.parse(value)
+            console.log('SUBSCRIBE Indexes: ', available_indexes)
+        })
     }
 
     const handleUploadFile = async (event) => {
@@ -69,7 +85,7 @@
         await load_existing_files()
         await handleParseOptions()
 
-        loadSelectedStore()
+        await loadSelectedStore()
     }
 
     const handleSelectBook = async (event) => {
@@ -101,6 +117,10 @@
 
         // Set selected RVC_index in store
         selected_index.set(event.target.value)
+    }
+
+    $: {
+        handleParseOptions()
     }
 
 </script>
