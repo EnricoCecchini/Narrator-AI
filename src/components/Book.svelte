@@ -1,12 +1,13 @@
 <script>
     import { onDestroy, onMount } from 'svelte';
 
-    import {    selected_book_lines,
-                selected_book,
-                selected_speaker,
-                selected_rvc,
-                selected_index,
-                AUDIO_PATH,
+    import {
+        selected_book_lines,
+        selected_book,
+        selected_speaker,
+        selected_rvc,
+        selected_index,
+        AUDIO_PATH,
     } from '../../static/store'
 
     import { narrate_line } from '../requests/narrate_line'
@@ -160,9 +161,10 @@
             return
         }
 
+        alert('Narrating Line')
         console.log(data)
-        await narrate_line(data)
 
+        await narrate_line(data)
         await handleReloadBook()
     }
 
@@ -210,7 +212,7 @@
                 console.log('AUDIO EXISTS: ', audio_path)
 
                 // Load audio file into audio list using fetch
-                fetch(audio_path)
+                await fetch(audio_path)
                     .then(response => response.blob())
                     .then(blob => {
                         const audio = new Audio(URL.createObjectURL(blob))
@@ -282,7 +284,13 @@
 
         console.log('AUDIO SOURCE: ', `${AUDIO_PATH}\\${$selected_book}\\${index}.wav`)
         audio = audioList[index]
-        audio.currentTime = 0
+
+        try {
+            audio.currentTime = 0
+        } catch(e) {
+            alert('Line has not been narrated yet')
+            return
+        }
 
         console.log('AUDIO: ', audio)
         console.log('AUDIO LIST PLAY: ', audioList)
