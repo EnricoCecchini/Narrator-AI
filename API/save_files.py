@@ -24,7 +24,7 @@ def save_book(BOOKS_PATH, book):
         lines = file.readlines()
 
         # Skip empty lines
-        lines = [l for l in lines if len(l.replace('\n', '')) > 0]
+        lines = [l for l in lines if len(l.strip().replace('\n', '')) > 0]
 
         for i, line in enumerate(lines):
             with open(os.path.join(processed_path, f"{i}.txt"), 'w', encoding='utf-8') as f:
